@@ -341,6 +341,34 @@ FRAGMENT;
 
 
   /**
+   * Fills form fields with given values and optionally submits it
+   * Fields are referenced by CSS3 selectors
+   *
+   * @param string $selector
+   * @param array $values
+   * @param boolean $submit
+   * @return \Canterville\Casper
+   */
+  public function fillSelectors($selector, array $values, $submit = false)
+  {
+    $valuesFragment = json_encode($values);
+    $submitFragment = $submit ? 'true' : 'false';
+
+    $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    this.fillSelectors('$selector', $valuesFragment, $submitFragment);
+  });
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
    * Configures and starts Casper, then open the provided url
    *
    * @param string $url
