@@ -170,6 +170,175 @@ class Casper
 
   /************************** CASPER METHODS **************************/
 
+  /**
+   * Moves back a step in browser’s history
+   *
+   * @return \Canterville\Casper
+   */
+  public function back()
+  {
+    $fragment =
+<<<FRAGMENT
+  casper.back();
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
+   * Bypasses a given number of defined navigation steps
+   *
+   * @param int $count
+   * @return \Canterville\Casper
+   */
+  public function bypass($count)
+  {
+    $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    this.bypass($count);
+  });
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
+   * Performs a click on the element matching the provided selector expression
+   *
+   * The method tries two strategies sequentially:
+   * 1. trying to trigger a MouseEvent in Javascript
+   * 2. using native QtWebKit event if the previous attempt failed
+   *
+   * @param string $selector
+   * @return \Canterville\Casper
+   */
+  public function click($selector)
+  {
+    $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    this.click('$selector');
+  });
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
+   * Clicks on the first DOM element found containing label text
+   *
+   * @param string $label
+   * @param null|string $tag Element node name
+   * @return \Canterville\Casper
+   */
+  public function clickLabel($label, $tag = null)
+  {
+    $tagFragment = isset($tag) ? "'$tag'" : 'undefined';
+
+    $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    this.clickLabel('$label', $tagFragment);
+  });
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
+   * Captures the entire page or defined area
+   *
+   * @param string $filename
+   * @param null|array $area Area defined on top, left, width and height
+   * @param null|array $options Defined options for format and quality
+   * @return \Canterville\Casper
+   * @throws \Canterville\InvalidArgumentException
+   */
+  public function capture($filename, array $area = null, array $options = null)
+  {
+    $areaFragment = 'undefined';
+    $optionsFragment = 'undefined';
+
+    if (isset($area)) {
+      $msgError = 'Array in parameter $clipRect must contain key "%s".';
+      if (!array_key_exists('top', $area)) {
+        throw new InvalidArgumentException(sprintf($msgError, 'top'));
+      }
+      if (!array_key_exists('left', $area)) {
+        throw new InvalidArgumentException(sprintf($msgError, 'left'));
+      }
+      if (!array_key_exists('width', $area)) {
+        throw new InvalidArgumentException(sprintf($msgError, 'width'));
+      }
+      if (!array_key_exists('height', $area)) {
+        throw new InvalidArgumentException(sprintf($msgError, 'height'));
+      }
+
+      $areaFragment = json_encode($area);
+    }
+
+    if (isset($options)) {
+      $optionsFragment = json_encode($options);
+    }
+
+    $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    this.capture('$filename', $areaFragment, $optionsFragment);
+  });
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
+   * Fills the fields of a form with given values and optionally submits it
+   * Fields are referenced by their name attribute
+   *
+   * @param string $selector
+   * @param array $values
+   * @param boolean $submit
+   * @return \Canterville\Casper
+   */
+  public function fill($selector, array $values, $submit = false)
+  {
+    $valuesFragment = json_encode($values);
+    $submitFragment = $submit ? 'true' : 'false';
+
+    $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    this.fill('$selector', $valuesFragment, $submitFragment);
+  });
+
+FRAGMENT;
+
+    $this->script .=  $fragment;
+
+    return $this;
+  }
+
 
   /**
    * Configures and starts Casper, then open the provided url
