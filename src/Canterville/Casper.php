@@ -7,6 +7,8 @@
 
 namespace Canterville;
 
+use Nette\Utils\Json;
+
 class Casper
 {
   // array of functions that run if is debug, one argument is message
@@ -291,11 +293,11 @@ FRAGMENT;
         throw new InvalidArgumentException(sprintf($msgError, 'height'));
       }
 
-      $areaFragment = json_encode($area);
+      $areaFragment = Json::encode($area);
     }
 
     if (isset($options)) {
-      $optionsFragment = json_encode($options);
+      $optionsFragment = Json::encode($options);
     }
 
     $fragment =
@@ -323,7 +325,7 @@ FRAGMENT;
    */
   public function fill($selector, array $values, $submit = false)
   {
-    $valuesFragment = json_encode($values);
+    $valuesFragment = Json::encode($values);
     $submitFragment = $submit ? 'true' : 'false';
 
     $fragment =
@@ -341,7 +343,7 @@ FRAGMENT;
 
 
   /**
-   * Fills form fields with given values and optionally submits it
+   * Fills the fields of a form with given values and optionally submits it
    * Fields are referenced by CSS3 selectors
    *
    * @param string $selector
@@ -351,7 +353,7 @@ FRAGMENT;
    */
   public function fillSelectors($selector, array $values, $submit = false)
   {
-    $valuesFragment = json_encode($values);
+    $valuesFragment = Json::encode($values);
     $submitFragment = $submit ? 'true' : 'false';
 
     $fragment =
