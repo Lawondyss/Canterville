@@ -371,6 +371,34 @@ FRAGMENT;
 
 
   /**
+   * Fills the fields of a form with given values and optionally submits it
+   * Fields are referenced by XPath selectors
+   *
+   * @param string $selector
+   * @param array $values
+   * @param boolean $submit
+   * @return \Canterville\Casper
+   */
+  public function fillXPath($selector, array $values, $submit = false)
+  {
+    $valuesFragment = Json::encode($values);
+    $submitFragment = $submit ? 'true' : 'false';
+
+    $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    this.fillXPath('$selector', $valuesFragment, $submitFragment);
+  });
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
    * Configures and starts Casper, then open the provided url
    *
    * @param string $url
