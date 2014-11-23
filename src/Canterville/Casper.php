@@ -35,6 +35,8 @@ class Casper
 
   private $script = '';
 
+  private $options = array();
+
 
   /************************** GETTERS AND SETTERS **************************/
 
@@ -123,6 +125,38 @@ class Casper
     }
 
     return $this->binDir;
+  }
+
+
+  /**
+   * @param array $options [name-of-option => value]
+   * @return \Canterville\Casper
+   */
+  public function setOptions(array $options)
+  {
+    $this->options = $options;
+    return $this;
+  }
+
+
+  /**
+   * @param string $name
+   * @param null|string $value
+   * @return \Canterville\Casper
+   */
+  public function setOption($name, $value = null)
+  {
+    $this->options[$name] = $value;
+    return $this;
+  }
+
+
+  /**
+   * @return array
+   */
+  public function getOptions()
+  {
+    return $this->options;
   }
 
 
@@ -454,9 +488,17 @@ FRAGMENT;
     $filename = uniqid('casper-') . '.js';
     file_put_contents($filename, $this->script);
 
+    $options = '';
+    foreach ($this->options as $name => $value) {
+      $options .= ' --' . $name;
+      if (isset($name)) {
+        $options .= '=' . $value;
+      }
+    }
+
     $commands = array(
       'export PATH=' . $this->getBinDir() . ':$PATH',
-      'casperjs ' . $filename,
+      'casperjs ' . $filename . $options,
     );
 
     exec(implode('; ', $commands), $this->output);
