@@ -435,10 +435,10 @@ FRAGMENT;
   /**
    * Configures and starts Casper, then open the provided url
    *
-   * @param string $url
+   * @param null|string $url
    * @return \Canterville\Casper
    */
-  public function start($url)
+  public function start($url = null)
   {
     $this->clean();
 
@@ -447,10 +447,27 @@ FRAGMENT;
   var casper = require('casper').create({
     verbose: true,
     logLevel: 'debug',
-    colorizerType: 'Dummy'
+    colorizerType: 'Dummy',
+    pageSettings: {
+      javascriptEnabled: true,
+      userAgent: '$this->userAgent'
+    },
+    viewportSize: {
+      width: 1280,
+      height: 720
+    }
   });
-  casper.userAgent('$this->userAgent');
-  casper.start().then(function() {
+
+  casper.start();
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    if (isset($url)) {
+      $openFragment =
+<<<OPENFRAGMENT
+  casper.then(function() {
     this.open('$url', {
       headers: {
         'Accept': 'text/html'
@@ -458,9 +475,9 @@ FRAGMENT;
     });
   });
 
-FRAGMENT;
-
-    $this->script .= $fragment;
+OPENFRAGMENT;
+      $this->script .= $openFragment;
+    }
 
     return $this;
   }
