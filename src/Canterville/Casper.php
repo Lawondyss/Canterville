@@ -523,6 +523,30 @@ FRAGMENT;
 
 
   /**
+   * Performs an HTTP request for opening a given location
+   * You can forge GET, POST, PUT, DELETE and HEAD requests in settings
+   *
+   * @param string $url
+   * @param array $settings
+   * @return \Canterville\Casper
+   */
+  public function open($url, array $settings = array())
+  {
+    $settingsFragment = Json::encode($settings);
+
+    $fragment =
+<<<FRAGMENT
+  casper.open('$url', $settingsFragment);
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
    * Configures and starts Casper, then open the provided url
    *
    * @param null|string $url
