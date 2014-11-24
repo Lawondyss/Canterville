@@ -382,6 +382,25 @@ FRAGMENT;
 
 
   /**
+   * Moves a step forward in browser’s history
+   *
+   * @return \Canterville\Casper
+   */
+  public function forward()
+  {
+    $fragment =
+<<<FRAGMENT
+  casper.forward();
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
    * Fills the fields of a form with given values and optionally submits it
    * Fields are referenced by their name attribute
    *
