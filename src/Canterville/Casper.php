@@ -11,6 +11,14 @@ use Nette\Utils\Json;
 
 class Casper
 {
+  const EVENT_MOUSE_UP = 'mouseup';
+  const EVENT_MOUSE_DOWN = 'mousedown';
+  const EVENT_CLICK = 'click';
+  const EVENT_MOUSE_MOVE = 'mousemove';
+  const EVENT_MOUSE_OVER = 'mouseover';
+  const EVENT_MOUSE_OUT = 'mouseout';
+
+
   // array of functions that run if is debug, one argument is message
   public $onDebug = array();
 
@@ -422,6 +430,44 @@ FRAGMENT;
 <<<FRAGMENT
   casper.then(function() {
     this.fillXPath('$selector', $valuesFragment, $submitFragment);
+  });
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
+   * Triggers a mouse event on the first element found matching the provided selector
+   *
+   * @param string $selector
+   * @param string $event
+   * @return \Canterville\Casper
+   * @throws \Canterville\InvalidArgumentException
+   */
+  public function mouseEvent($selector, $event)
+  {
+    $supportedEvents = array(
+      self::EVENT_CLICK,
+      self::EVENT_MOUSE_DOWN,
+      self::EVENT_MOUSE_MOVE,
+      self::EVENT_MOUSE_OUT,
+      self::EVENT_MOUSE_OVER,
+      self::EVENT_MOUSE_UP,
+    );
+
+    if (!in_array($event, $supportedEvents)) {
+      $msg = sprintf('Mouse event "%s" is is not supported.', $event);
+      throw new InvalidArgumentException($msg);
+    }
+
+    $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    this.mouseEvent('$event', '$selector');
   });
 
 FRAGMENT;
