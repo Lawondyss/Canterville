@@ -566,6 +566,29 @@ FRAGMENT;
 
 
   /**
+   * Scrolls current document to the coordinates defined by the value of x and y
+   *
+   * @param int $x
+   * @param int $y
+   * @return \Canterville\Casper
+   */
+  public function scrollTo($x, $y = 0)
+  {
+    $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    this.scrollTo($x, $y);
+  });
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
    * Configures and starts Casper, then open the provided url
    *
    * @param null|string $url
