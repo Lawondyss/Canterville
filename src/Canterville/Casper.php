@@ -357,6 +357,31 @@ FRAGMENT;
 
 
   /**
+   * Saves a remote resource onto the filesystem
+   *
+   * @param string $filename
+   * @param null|string $url If null then download current page
+   * @return \Canterville\Casper
+   */
+  public function download($filename, $url = null)
+  {
+    $urlFragment = isset($url) ? "'$url'" : 'this.getCurrentUrl()';
+
+    $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    this.download($urlFragment, '$filename');
+  });
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
    * Fills the fields of a form with given values and optionally submits it
    * Fields are referenced by their name attribute
    *
