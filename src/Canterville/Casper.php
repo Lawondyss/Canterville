@@ -547,6 +547,25 @@ FRAGMENT;
 
 
   /**
+   * Reloads current page location
+   *
+   * @return \Canterville\Casper
+   */
+  public function reload()
+  {
+    $fragment =
+<<<FRAGMENT
+  casper.reload();
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
    * Configures and starts Casper, then open the provided url
    *
    * @param null|string $url
