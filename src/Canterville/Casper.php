@@ -838,4 +838,28 @@ FRAGMENT;
     }
   }
 
+
+  /**
+   * Pause steps suite execution for a given amount of time
+   *
+   * @param int $seconds
+   * @return \Canterville\Casper
+   */
+  public function wait($seconds)
+  {
+    $secondsFragment = $seconds * 1000;
+
+    $fragment =
+<<<FRAGMENT
+  casper.wait($secondsFragment, function() {
+    this.echo('[wait] time $seconds sec occurred');
+  });
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
 }
