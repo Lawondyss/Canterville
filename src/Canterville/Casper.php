@@ -815,7 +815,12 @@ FRAGMENT;
     $options = '';
     foreach ($this->options as $name => $value) {
       $options .= ' --' . $name;
-      if (isset($name)) {
+
+      if (isset($value)) {
+        if (is_bool($value)) {
+          $value = $value ? 'yes' : 'no';
+        }
+
         $options .= '=' . $value;
       }
     }
