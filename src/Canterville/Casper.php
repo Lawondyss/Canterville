@@ -28,6 +28,16 @@ class Casper
   const MODIFIER_META = 'meta';
   const MODIFIER_KEYPAD = 'keypad';
 
+  const OPEN_OPTION_METHOD = 'method';
+  const OPEN_OPTION_DATA = 'data';
+  const OPEN_OPTION_HEADERS = 'headers';
+
+  const METHOD_GET = 'get';
+  const METHOD_POST = 'post';
+  const METHOD_PUT = 'put';
+  const METHOD_DELETE = 'delete';
+  const METHOD_HEAD = 'head';
+
 
   // array of functions that run if is debug, one argument is message
   public $onDebug = array();
@@ -560,10 +570,23 @@ FRAGMENT;
    * @param string $url
    * @param array $settings
    * @return \Canterville\Casper
+   * @throws \Canterville\InvalidArgumentException
    */
   public function open($url, array $settings = array())
   {
-    $settingsFragment = Json::encode($settings);
+    $validKeys = array(
+      self::OPEN_OPTION_METHOD,
+      self::OPEN_OPTION_DATA,
+      self::OPEN_OPTION_HEADERS,
+    );
+    $invalidKeys = $this->checkValidKeys($validKeys, $settings);
+
+    if (count($invalidKeys) > 0) {
+      $msg = sprintf('In parameter $settings is this invalid keys: %s', implode(', ', $invalidKeys));
+      throw new InvalidArgumentException($msg);
+    }
+
+    $settingsFragment = count($settings) > 0 ? Json::encode($settings) : 'undefined';
 
     $fragment =
 <<<FRAGMENT
