@@ -18,6 +18,16 @@ class Casper
   const EVENT_MOUSE_OVER = 'mouseover';
   const EVENT_MOUSE_OUT = 'mouseout';
 
+  const SEND_KEYS_OPTION_RESET = 'reset';
+  const SEND_KEYS_OPTION_KEEP_FOCUS = 'keepFocus';
+  const SEND_KEYS_OPTION_MODIFIERS = 'modifiers';
+
+  const MODIFIER_CTRL = 'ctrl';
+  const MODIFIER_ALT = 'alt';
+  const MODIFIER_SHIFT = 'shift';
+  const MODIFIER_META = 'meta';
+  const MODIFIER_KEYPAD = 'keypad';
+
 
   // array of functions that run if is debug, one argument is message
   public $onDebug = array();
@@ -599,6 +609,53 @@ FRAGMENT;
 <<<FRAGMENT
   casper.then(function() {
     this.scrollToBottom();
+  });
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
+   * Sends native keyboard events to the element
+   * Supported HTMLElements: <input>, <textarea> and HTMLElement with contenteditable="true"
+   *
+   * @param string $selector
+   * @param string $keys
+   * @param array $options See constants Casper::SEND_KEYS_OPTION_*
+   * @return \Canterville\Casper
+   * @throws \Canterville\InvalidArgumentException
+   *
+   * Options values:
+   *  - RESET: boolean
+   *  - KEEP_FOCUS: boolean
+   *  - MODIFIERS: array of constants Casper::MODIFIERS_*
+   */
+  public function sendKeys($selector, $keys, array $options = array())
+  {
+    if (array_key_exists(self::SEND_KEYS_OPTION_MODIFIERS, $options)) {
+      if (is_array($options[self::SEND_KEYS_OPTION_MODIFIERS])) {
+        $options[self::SEND_KEYS_OPTION_MODIFIERS] = implode('+', $options[self::SEND_KEYS_OPTION_MODIFIERS]);
+      }
+      else {
+        $msg = sprintf(
+          'Value in option "%s" must be array, given "%s".',
+          self::SEND_KEYS_OPTION_MODIFIERS,
+          gettype($options[self::SEND_KEYS_OPTION_MODIFIERS])
+        );
+        throw new InvalidArgumentException($msg);
+      }
+    }
+
+    $optionsFragment = count($options) > 0 ? Json::encode($options) : 'undefined';
+
+    $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    this.sendKeys('$selector', '$keys', $optionsFragment);
   });
 
 FRAGMENT;
