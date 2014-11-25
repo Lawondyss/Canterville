@@ -38,6 +38,14 @@ class Casper
   const METHOD_DELETE = 'delete';
   const METHOD_HEAD = 'head';
 
+  const CAPTURE_AREA_TOP = 'top';
+  const CAPTURE_AREA_LEFT = 'left';
+  const CAPTURE_AREA_WIDTH = 'width';
+  const CAPTURE_AREA_HEIGHT = 'height';
+
+  const CAPTURE_OPTION_FORMAT = 'format';
+  const CAPTURE_OPTION_QUALITY = 'quality';
+
 
   // array of functions that run if is debug, one argument is message
   public $onDebug = array();
@@ -362,18 +370,31 @@ FRAGMENT;
     $optionsFragment = 'undefined';
 
     if (isset($area)) {
-      $msgError = 'Array in parameter $clipRect must contain key "%s".';
-      if (!array_key_exists('top', $area)) {
-        throw new InvalidArgumentException(sprintf($msgError, 'top'));
+      $validKeys = array(
+        self::CAPTURE_AREA_TOP,
+        self::CAPTURE_AREA_LEFT,
+        self::CAPTURE_AREA_WIDTH,
+        self::CAPTURE_AREA_HEIGHT,
+      );
+      $check = $this->checkValidKeys($validKeys, $area);
+
+      if (count($check) > 0) {
+        $msg = sprintf('In parameter $area is this invalid keys: %s', implode(', ', $check));
+        throw new InvalidArgumentException($msg);
       }
-      if (!array_key_exists('left', $area)) {
-        throw new InvalidArgumentException(sprintf($msgError, 'left'));
+
+      $msgError = 'Array in parameter $area must contain key "%s".';
+      if (!array_key_exists(self::CAPTURE_AREA_TOP, $area)) {
+        throw new InvalidArgumentException(sprintf($msgError, self::CAPTURE_AREA_TOP));
       }
-      if (!array_key_exists('width', $area)) {
-        throw new InvalidArgumentException(sprintf($msgError, 'width'));
+      if (!array_key_exists(self::CAPTURE_AREA_LEFT, $area)) {
+        throw new InvalidArgumentException(sprintf($msgError, self::CAPTURE_AREA_LEFT));
       }
-      if (!array_key_exists('height', $area)) {
-        throw new InvalidArgumentException(sprintf($msgError, 'height'));
+      if (!array_key_exists(self::CAPTURE_AREA_WIDTH, $area)) {
+        throw new InvalidArgumentException(sprintf($msgError, self::CAPTURE_AREA_WIDTH));
+      }
+      if (!array_key_exists(self::CAPTURE_AREA_HEIGHT, $area)) {
+        throw new InvalidArgumentException(sprintf($msgError, self::CAPTURE_AREA_HEIGHT));
       }
 
       $areaFragment = Json::encode($area);
