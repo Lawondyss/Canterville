@@ -222,6 +222,27 @@ class Casper
   }
 
 
+  /**
+   * Check if it's all keys in array are valid
+   *
+   * @param array $validKeys
+   * @param array $field
+   * @return array
+   */
+  private function checkValidKeys(array $validKeys, array $field)
+  {
+    $invalidKeys = array();
+
+    foreach ($field as $key => $value) {
+      if (!in_array($key, $validKeys)) {
+        $invalidKeys[] = $key;
+      }
+    }
+
+    return $invalidKeys;
+  }
+
+
   /************************** CASPER METHODS **************************/
 
   /**
