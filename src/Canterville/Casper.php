@@ -589,6 +589,27 @@ FRAGMENT;
 
 
   /**
+   * Scrolls current document to its bottom
+   *
+   * @return \Canterville\Casper
+   */
+  public function scrollToBottom()
+  {
+    $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    this.scrollToBottom();
+  });
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
    * Configures and starts Casper, then open the provided url
    *
    * @param null|string $url
