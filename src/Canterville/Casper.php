@@ -568,16 +568,16 @@ FRAGMENT;
   /**
    * Scrolls current document to the coordinates defined by the value of x and y
    *
-   * @param int $x
-   * @param int $y
+   * @param int $down
+   * @param int $right
    * @return \Canterville\Casper
    */
-  public function scrollTo($x, $y = 0)
+  public function scrollTo($down, $right = 0)
   {
     $fragment =
 <<<FRAGMENT
   casper.then(function() {
-    this.scrollTo($x, $y);
+    this.scrollTo($right, $down);
   });
 
 FRAGMENT;
