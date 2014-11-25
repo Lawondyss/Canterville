@@ -366,10 +366,10 @@ FRAGMENT;
    */
   public function capture($filename, array $area = null, array $options = null)
   {
-    $areaFragment = 'undefined';
-    $optionsFragment = 'undefined';
-
-    if (isset($area)) {
+    if (!isset($area)) {
+      $areaFragment = 'undefined';
+    }
+    else {
       $validKeys = array(
         self::CAPTURE_AREA_TOP,
         self::CAPTURE_AREA_LEFT,
@@ -400,9 +400,7 @@ FRAGMENT;
       $areaFragment = Json::encode($area);
     }
 
-    if (isset($options)) {
-      $optionsFragment = Json::encode($options);
-    }
+    $optionsFragment = isset($options) ? Json::encode($options) : 'undefined';
 
     $fragment =
 <<<FRAGMENT
@@ -589,25 +587,30 @@ FRAGMENT;
    * You can forge GET, POST, PUT, DELETE and HEAD requests in settings
    *
    * @param string $url
-   * @param array $settings
+   * @param null|array $settings
    * @return \Canterville\Casper
    * @throws \Canterville\InvalidArgumentException
    */
-  public function open($url, array $settings = array())
+  public function open($url, array $settings = null)
   {
-    $validKeys = array(
-      self::OPEN_OPTION_METHOD,
-      self::OPEN_OPTION_DATA,
-      self::OPEN_OPTION_HEADERS,
-    );
-    $invalidKeys = $this->checkValidKeys($validKeys, $settings);
-
-    if (count($invalidKeys) > 0) {
-      $msg = sprintf('In parameter $settings is this invalid keys: %s', implode(', ', $invalidKeys));
-      throw new InvalidArgumentException($msg);
+    if (!isset($settings)) {
+      $settingsFragment = 'undefined';
     }
+    else {
+      $validKeys = array(
+        self::OPEN_OPTION_METHOD,
+        self::OPEN_OPTION_DATA,
+        self::OPEN_OPTION_HEADERS,
+      );
+      $invalidKeys = $this->checkValidKeys($validKeys, $settings);
 
-    $settingsFragment = count($settings) > 0 ? Json::encode($settings) : 'undefined';
+      if (count($invalidKeys) > 0) {
+        $msg = sprintf('In parameter $settings is this invalid keys: %s', implode(', ', $invalidKeys));
+        throw new InvalidArgumentException($msg);
+      }
+
+      $settingsFragment = Json::encode($settings);
+    }
 
     $fragment =
 <<<FRAGMENT
@@ -690,7 +693,7 @@ FRAGMENT;
    *
    * @param string $selector
    * @param string $keys
-   * @param array $options See constants Casper::SEND_KEYS_OPTION_*
+   * @param array|null $options See constants Casper::SEND_KEYS_OPTION_*
    * @return \Canterville\Casper
    * @throws \Canterville\InvalidArgumentException
    *
@@ -699,23 +702,28 @@ FRAGMENT;
    *  - KEEP_FOCUS: boolean
    *  - MODIFIERS: array of constants Casper::MODIFIERS_*
    */
-  public function sendKeys($selector, $keys, array $options = array())
+  public function sendKeys($selector, $keys, array $options = null)
   {
-    if (array_key_exists(self::SEND_KEYS_OPTION_MODIFIERS, $options)) {
-      if (is_array($options[self::SEND_KEYS_OPTION_MODIFIERS])) {
-        $options[self::SEND_KEYS_OPTION_MODIFIERS] = implode('+', $options[self::SEND_KEYS_OPTION_MODIFIERS]);
-      }
-      else {
-        $msg = sprintf(
-          'Value in option "%s" must be array, given "%s".',
-          self::SEND_KEYS_OPTION_MODIFIERS,
-          gettype($options[self::SEND_KEYS_OPTION_MODIFIERS])
-        );
-        throw new InvalidArgumentException($msg);
-      }
+    if (!isset($options)) {
+      $optionsFragment = 'undefined';
     }
+    else {
+      if (array_key_exists(self::SEND_KEYS_OPTION_MODIFIERS, $options)) {
+        if (is_array($options[self::SEND_KEYS_OPTION_MODIFIERS])) {
+          $options[self::SEND_KEYS_OPTION_MODIFIERS] = implode('+', $options[self::SEND_KEYS_OPTION_MODIFIERS]);
+        }
+        else {
+          $msg = sprintf(
+            'Value in option "%s" must be array, given "%s".',
+            self::SEND_KEYS_OPTION_MODIFIERS,
+            gettype($options[self::SEND_KEYS_OPTION_MODIFIERS])
+          );
+          throw new InvalidArgumentException($msg);
+        }
+      }
 
-    $optionsFragment = count($options) > 0 ? Json::encode($options) : 'undefined';
+      $optionsFragment = Json::encode($options);
+    }
 
     $fragment =
 <<<FRAGMENT
@@ -785,9 +793,9 @@ OPENFRAGMENT;
   /**
    * Runs the whole suite of steps
    *
-   * @param boolean $removeScript
+   * @param boolean $preserveScript
    */
-  public function run($removeScript = true)
+  public function run($preserveScript = false)
   {
     $fragment =
 <<<FRAGMENT
@@ -820,7 +828,7 @@ FRAGMENT;
     exec(implode('; ', $commands), $this->output);
     $this->processOutput();
 
-    if ($removeScript) {
+    if ($preserveScript) {
       unlink($filename);
     }
   }
