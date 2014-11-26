@@ -862,4 +862,33 @@ FRAGMENT;
     return $this;
   }
 
+
+  /**
+   * Waits until an element matching the provided selector exists in remote DOM
+   *
+   * @param string $selector
+   * @param null|int $maxSeconds
+   * @return \Canterville\Casper
+   */
+  public function waitForSelector($selector, $maxSeconds = null)
+  {
+    $timeoutFragment = isset($maxSeconds) ? $maxSeconds * 1000 : 'undefined';
+
+    $fragment =
+<<<FRAGMENT
+  casper.waitForSelector('$selector',
+    function() {
+      this.echo('[waitForSelector] element "$selector" found');
+    },
+    function() {
+      this.echo('[waitForSelector] time for wait on element "$selector" occurred');
+    }, $timeoutFragment);
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
 }
