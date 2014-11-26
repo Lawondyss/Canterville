@@ -833,7 +833,7 @@ FRAGMENT;
     exec(implode('; ', $commands), $this->output);
     $this->processOutput();
 
-    if ($preserveScript) {
+    if (!$preserveScript) {
       unlink($filename);
     }
   }
