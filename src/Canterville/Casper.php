@@ -891,4 +891,33 @@ FRAGMENT;
     return $this;
   }
 
+
+  /**
+   * Waits until the passed text is present in the page contents
+   *
+   * @param string $text
+   * @param null|int $maxSeconds
+   * @return \Canterville\Casper
+   */
+  public function waitForText($text, $maxSeconds = null)
+  {
+    $timeoutFragment = isset($maxSeconds) ? $maxSeconds * 1000 : 'undefined';
+
+    $fragment =
+<<<FRAGMENT
+  casper.waitForText('$text',
+    function() {
+      this.echo('[waitForText] text "$text" found');
+    },
+    function() {
+      this.echo('[waitForText] time for wait on text "$text" occurred');
+    }, $timeoutFragment);
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
 }
