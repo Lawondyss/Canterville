@@ -441,6 +441,24 @@ FRAGMENT;
   }
 
 
+  /***/
+  public function techo($string, $evaluate = false)
+  {
+    $stringFragment = $evaluate ? $string : "'$string'";
+    $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    this.echo($stringFragment);
+  });
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
   /**
    * Moves a step forward in browser’s history
    *
@@ -854,6 +872,35 @@ FRAGMENT;
   casper.wait($secondsFragment, function() {
     this.echo('[wait] time $seconds sec occurred');
   });
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
+   * Waits for the current page url to match the provided argument
+   *
+   * @param string $url Javascript regular expression
+   * @param null|int $maxSeconds
+   * @return \Canterville\Casper
+   */
+  public function waitForUrl($url, $maxSeconds = null)
+  {
+    $timeoutFragment = isset($maxSeconds) ? $maxSeconds * 1000 : 'undefined';
+
+    $fragment =
+<<<FRAGMENT
+  casper.waitForUrl(/$url/,
+    function() {
+      this.echo('[waitForUrl] redirected to "$url"');
+    },
+    function() {
+      this.echo('[waitForUrl] time for wait on URL "$url" occurred');
+    }, $timeoutFragment);
 
 FRAGMENT;
 
