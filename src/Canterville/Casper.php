@@ -54,11 +54,6 @@ class Casper
 
   public $currentTitle;
 
-
-  private $tagCurrentUrl = '[CURRENT_URL]';
-
-  private $tagCurrentTitle = '[CURRENT_TITLE]';
-
   private $debug = false;
 
   private $userAgent = 'casper';
@@ -216,15 +211,6 @@ class Casper
   private function processOutput()
   {
     foreach ($this->output as $outputLine) {
-      if (strpos($outputLine, $this->tagCurrentUrl) !== false) {
-        $this->currentUrl = str_replace($this->tagCurrentUrl, '', $outputLine);
-        continue;
-      }
-      if (strpos($outputLine, $this->tagCurrentTitle) !== false) {
-        $this->currentTitle = str_replace($this->tagCurrentTitle, '', $outputLine);
-        continue;
-      }
-
       if (strpos($outputLine, 'Navigation requested: url=') !== false) {
         $frag0 = explode('Navigation requested: url=', $outputLine);
         $frag1 = explode(', type=', $frag0[1]);
@@ -772,7 +758,6 @@ FRAGMENT;
   var casper = require('casper').create({
     verbose: true,
     logLevel: 'debug',
-    colorizerType: 'Dummy',
     pageSettings: {
       javascriptEnabled: true,
       userAgent: '$this->userAgent'
@@ -817,11 +802,6 @@ OPENFRAGMENT;
   {
     $fragment =
 <<<FRAGMENT
-  casper.then(function() {
-    this.echo('{$this->tagCurrentUrl}' + this.getCurrentUrl());
-    this.echo('{$this->tagCurrentTitle}' + this.getTitle());
-  });
-
   casper.run();
 FRAGMENT;
 
@@ -848,7 +828,16 @@ FRAGMENT;
       'casperjs ' . $filename . $options,
     );
 
-    exec(implode('; ', $commands), $this->output);
+    $fp = popen(implode('; ', $commands), 'r');
+    while (!feof($fp)) {
+      $line = fread($fp, 1024);
+      $line = str_replace(array('[phantom] ', '[remote] '), '', $line);
+      $line = str_replace(PHP_EOL . PHP_EOL, PHP_EOL, $line);
+      $this->output[] = $line;
+      echo $line;
+      flush();
+    }
+    fclose($fp);
     $this->processOutput();
 
     if (!$preserveScript) {
