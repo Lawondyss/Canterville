@@ -17,7 +17,7 @@ class PhantomInstaller extends BaseInstaller
     $this->name = 'PhantomJS';
     $this->version = '1.9.8';
     $this->url = $this->getUrl($this->version);
-    $this->distType = $this->getDistType($this->distType);
+    $this->distType = $this->getDistType($this->url);
     $this->targetDir = 'vendor/lawondyss/phantomjs';
 
     parent::init();
