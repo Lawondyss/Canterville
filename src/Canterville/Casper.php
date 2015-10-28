@@ -386,24 +386,6 @@ FRAGMENT;
   }
 
 
-  /***/
-  public function techo($string, $evaluate = false)
-  {
-    $stringFragment = $evaluate ? $string : "'$string'";
-    $fragment =
-<<<FRAGMENT
-  casper.then(function() {
-    this.echo($stringFragment);
-  });
-
-FRAGMENT;
-
-    $this->script .= $fragment;
-
-    return $this;
-  }
-
-
   /**
    * Fills the fields of a form with given values and optionally submits it
    * Fields are referenced by their name attribute
@@ -918,6 +900,30 @@ FRAGMENT;
     function() {
       this.echo('[waitForUrl] time for wait on URL "$url" occurred');
     }, $timeoutFragment);
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
+   * Write something to output
+   *
+   * @param string $message
+   * @param bool|false $evaluate
+   * @return $this
+   */
+  public function write($message, $evaluate = false)
+  {
+    $stringFragment = $evaluate ? $message : "'$message'";
+    $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    this.echo($stringFragment);
+  });
 
 FRAGMENT;
 
