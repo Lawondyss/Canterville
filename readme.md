@@ -9,9 +9,6 @@ Over Composer `require lawondyss/canterville:dev-master`.
 
 After installation include to your composer.json file this code:
 ```json
-  "config": {
-    "bin-dir": "bin"
-  },
   "scripts": {
     "post-install-cmd": [
       "Canterville\\Installer::install"
