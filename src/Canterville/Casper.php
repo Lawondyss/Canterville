@@ -833,6 +833,12 @@ FRAGMENT;
     $fp = popen(implode('; ', $commands), 'r');
     while (!feof($fp)) {
       $line = fread($fp, 1024);
+
+      // remove line with message of PhantomJS bug
+      if (Strings::contains($line, 'Unsafe JavaScript attempt to access frame')) {
+        continue;
+      }
+
       $line = Strings::replace($line, '[\[phantom\] |\[remote\] ]');
       $line = Strings::normalizeNewLines($line);
       $this->output[] = $line;
