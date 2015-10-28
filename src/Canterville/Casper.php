@@ -8,6 +8,8 @@
 namespace Canterville;
 
 use Nette\Utils\Json;
+use Nette\Utils\Strings;
+use Nette\Utils\FileSystem;
 
 class Casper
 {
@@ -211,7 +213,7 @@ class Casper
   private function processOutput()
   {
     foreach ($this->output as $outputLine) {
-      if (strpos($outputLine, 'Navigation requested: url=') !== false) {
+      if (Strings::contains($outputLine, 'Navigation requested')) {
         $frag0 = explode('Navigation requested: url=', $outputLine);
         $frag1 = explode(', type=', $frag0[1]);
         $this->requestedUrls[] = $frag1[0];
@@ -808,7 +810,7 @@ FRAGMENT;
     $this->script .= $fragment;
 
     $filename = uniqid('casper-') . '.js';
-    file_put_contents($filename, $this->script);
+    FileSystem::write($filename, $this->script);
 
     $options = '';
     foreach ($this->options as $name => $value) {
@@ -831,8 +833,8 @@ FRAGMENT;
     $fp = popen(implode('; ', $commands), 'r');
     while (!feof($fp)) {
       $line = fread($fp, 1024);
-      $line = str_replace(array('[phantom] ', '[remote] '), '', $line);
-      $line = str_replace(PHP_EOL . PHP_EOL, PHP_EOL, $line);
+      $line = Strings::replace($line, '[\[phantom\] |\[remote\] ]');
+      $line = Strings::normalizeNewLines($line);
       $this->output[] = $line;
       echo $line;
       flush();
@@ -841,7 +843,7 @@ FRAGMENT;
     $this->processOutput();
 
     if (!$preserveScript) {
-      unlink($filename);
+      FileSystem::delete($filename);
     }
   }
 
