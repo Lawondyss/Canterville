@@ -941,7 +941,7 @@ FRAGMENT;
   private function clean()
   {
     $this->output = [];
-    $this->requestedUrls = [];
+    $this->requests = [];
     $this->currentUrl = null;
     $this->script = '';
   }
