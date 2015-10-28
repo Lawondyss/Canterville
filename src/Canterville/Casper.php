@@ -63,7 +63,7 @@ class Casper
 
   private $output = [];
 
-  private $requestedUrls = [];
+  private $requests = [];
 
   private $binDir;
 
@@ -126,11 +126,21 @@ class Casper
 
 
   /**
+   * @param null|string $name
    * @return array
    */
-  public function getRequestedUrls()
+  public function getRequests($name = null)
   {
-    return $this->requestedUrls;
+    if (!isset($name)) {
+      return $this->requests;
+    }
+
+    $requests = [];
+    foreach ($this->requests as $key => $request) {
+      $requests[$key] = isset($request[$name]) ? $request[$name] : null;
+    }
+
+    return $requests;
   }
 
 
@@ -937,16 +947,33 @@ FRAGMENT;
   private function logOutput()
   {
     foreach ($this->output as $outputLine) {
-      if (Strings::contains($outputLine, 'Navigation requested')) {
-        $frag0 = explode('Navigation requested: url=', $outputLine);
-        $frag1 = explode(', type=', $frag0[1]);
-        $this->requestedUrls[] = $frag1[0];
+      if (Strings::contains($outputLine, 'Navigation requested:')) {
+        $this->logRequest($outputLine);
       }
 
       foreach ($this->onLog as $debugFunction) {
         call_user_func($debugFunction, $outputLine);
       }
     }
+  }
+
+
+  /**
+   * Logging navigation requested
+   *
+   * @param string $requestLine
+   */
+  private function logRequest($requestLine)
+  {
+    $requestLine = Strings::replace($requestLine, '[Navigation requested: ]');
+    $requestLine = Strings::trim($requestLine);
+    $matches = Strings::matchAll($requestLine, '~ ([^=]+)=([^,]+),?~');
+    $request = [];
+    foreach ($matches as $match) {
+      $match[2] = $match[2] === 'true' ? true : ($match[2] === 'false' ? false : $match[2]);
+      $request[$match[1]] = $match[2];
+    }
+    $this->requests[] = $request;
   }
 
 
