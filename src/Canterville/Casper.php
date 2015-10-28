@@ -1,6 +1,7 @@
 <?php
 /**
  * CasperJS wrapper
+ *
  * @package Canterville
  * @author Ladislav Vondráček
  */
@@ -50,7 +51,7 @@ class Casper
 
 
   // array of functions that run if is debug, one argument is message
-  public $onLog = array();
+  public $onLog = [];
 
   public $currentUrl;
 
@@ -60,15 +61,15 @@ class Casper
 
   private $userAgent = 'casper';
 
-  private $output = array();
+  private $output = [];
 
-  private $requestedUrls = array();
+  private $requestedUrls = [];
 
   private $binDir;
 
   private $script = '';
 
-  private $options = array();
+  private $options = [];
 
 
   /************************** GETTERS AND SETTERS **************************/
@@ -80,6 +81,7 @@ class Casper
   public function setDebug($debug = true)
   {
     $this->debug = (bool)$debug;
+
     return $this;
   }
 
@@ -100,6 +102,7 @@ class Casper
   public function setUserAgent($userAgent)
   {
     $this->userAgent = $userAgent;
+
     return $this;
   }
 
@@ -143,6 +146,7 @@ class Casper
       throw new InvalidArgumentException('The binary directory does not exist.');
     }
     $this->binDir = $binDir;
+
     return $this;
   }
 
@@ -168,6 +172,7 @@ class Casper
   public function setOptions(array $options)
   {
     $this->options = $options;
+
     return $this;
   }
 
@@ -180,6 +185,7 @@ class Casper
   public function setOption($name, $value = null)
   {
     $this->options[$name] = $value;
+
     return $this;
   }
 
@@ -190,60 +196,6 @@ class Casper
   public function getOptions()
   {
     return $this->options;
-  }
-
-
-  /************************** HELPERS **************************/
-
-  /**
-   * Clear the current CasperJS script
-   */
-  private function clean()
-  {
-    $this->output = array();
-    $this->requestedUrls = array();
-    $this->currentUrl = null;
-    $this->script = '';
-  }
-
-
-  /**
-   * Logging output
-   */
-  private function logOutput()
-  {
-    foreach ($this->output as $outputLine) {
-      if (Strings::contains($outputLine, 'Navigation requested')) {
-        $frag0 = explode('Navigation requested: url=', $outputLine);
-        $frag1 = explode(', type=', $frag0[1]);
-        $this->requestedUrls[] = $frag1[0];
-      }
-
-      foreach ($this->onLog as $debugFunction) {
-        call_user_func($debugFunction, $outputLine);
-      }
-    }
-  }
-
-
-  /**
-   * Check if it's all keys in array are valid
-   *
-   * @param array $validKeys
-   * @param array $field
-   * @return array
-   */
-  private function checkValidKeys(array $validKeys, array $field)
-  {
-    $invalidKeys = array();
-
-    foreach ($field as $key => $value) {
-      if (!in_array($key, $validKeys)) {
-        $invalidKeys[] = $key;
-      }
-    }
-
-    return $invalidKeys;
   }
 
 
@@ -291,57 +243,6 @@ FRAGMENT;
 
 
   /**
-   * Performs a click on the element matching the provided selector expression
-   *
-   * The method tries two strategies sequentially:
-   * 1. trying to trigger a MouseEvent in Javascript
-   * 2. using native QtWebKit event if the previous attempt failed
-   *
-   * @param string $selector
-   * @return \Canterville\Casper
-   */
-  public function click($selector)
-  {
-    $fragment =
-<<<FRAGMENT
-  casper.then(function() {
-    this.click('$selector');
-  });
-
-FRAGMENT;
-
-    $this->script .= $fragment;
-
-    return $this;
-  }
-
-
-  /**
-   * Clicks on the first DOM element found containing label text
-   *
-   * @param string $label
-   * @param null|string $tag Element node name
-   * @return \Canterville\Casper
-   */
-  public function clickLabel($label, $tag = null)
-  {
-    $tagFragment = isset($tag) ? "'$tag'" : 'undefined';
-
-    $fragment =
-<<<FRAGMENT
-  casper.then(function() {
-    this.clickLabel('$label', $tagFragment);
-  });
-
-FRAGMENT;
-
-    $this->script .= $fragment;
-
-    return $this;
-  }
-
-
-  /**
    * Captures the entire page or defined area
    *
    * @param string $filename
@@ -356,12 +257,12 @@ FRAGMENT;
       $areaFragment = 'undefined';
     }
     else {
-      $validKeys = array(
+      $validKeys = [
         self::CAPTURE_AREA_TOP,
         self::CAPTURE_AREA_LEFT,
         self::CAPTURE_AREA_WIDTH,
         self::CAPTURE_AREA_HEIGHT,
-      );
+      ];
       $check = $this->checkValidKeys($validKeys, $area);
 
       if (count($check) > 0) {
@@ -403,6 +304,55 @@ FRAGMENT;
 
 
   /**
+   * Performs a click on the element matching the provided selector expression
+   * The method tries two strategies sequentially:
+   * 1. trying to trigger a MouseEvent in Javascript
+   * 2. using native QtWebKit event if the previous attempt failed
+   *
+   * @param string $selector
+   * @return \Canterville\Casper
+   */
+  public function click($selector)
+  {
+    $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    this.click('$selector');
+  });
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
+   * Clicks on the first DOM element found containing label text
+   *
+   * @param string $label
+   * @param null|string $tag Element node name
+   * @return \Canterville\Casper
+   */
+  public function clickLabel($label, $tag = null)
+  {
+    $tagFragment = isset($tag) ? "'$tag'" : 'undefined';
+
+    $fragment = <<<FRAGMENT
+  casper.then(function() {
+    this.clickLabel('$label', $tagFragment);
+  });
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
    * Saves a remote resource onto the filesystem
    *
    * @param string $filename
@@ -413,8 +363,7 @@ FRAGMENT;
   {
     $urlFragment = isset($url) ? "'$url'" : 'this.getCurrentUrl()';
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.then(function() {
     this.download($urlFragment, '$filename');
   });
@@ -446,25 +395,6 @@ FRAGMENT;
 
 
   /**
-   * Moves a step forward in browser’s history
-   *
-   * @return \Canterville\Casper
-   */
-  public function forward()
-  {
-    $fragment =
-<<<FRAGMENT
-  casper.forward();
-
-FRAGMENT;
-
-    $this->script .= $fragment;
-
-    return $this;
-  }
-
-
-  /**
    * Fills the fields of a form with given values and optionally submits it
    * Fields are referenced by their name attribute
    *
@@ -486,7 +416,7 @@ FRAGMENT;
 
 FRAGMENT;
 
-    $this->script .=  $fragment;
+    $this->script .= $fragment;
 
     return $this;
   }
@@ -549,6 +479,25 @@ FRAGMENT;
 
 
   /**
+   * Moves a step forward in browser’s history
+   *
+   * @return \Canterville\Casper
+   */
+  public function forward()
+  {
+    $fragment =
+<<<FRAGMENT
+  casper.forward();
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
    * Triggers a mouse event on the first element found matching the provided selector
    *
    * @param string $selector
@@ -558,14 +507,14 @@ FRAGMENT;
    */
   public function mouseEvent($selector, $event)
   {
-    $supportedEvents = array(
+    $supportedEvents = [
       self::EVENT_CLICK,
       self::EVENT_MOUSE_DOWN,
       self::EVENT_MOUSE_MOVE,
       self::EVENT_MOUSE_OUT,
       self::EVENT_MOUSE_OVER,
       self::EVENT_MOUSE_UP,
-    );
+    ];
 
     if (!in_array($event, $supportedEvents)) {
       $msg = sprintf('Mouse event "%s" is is not supported.', $event);
@@ -601,11 +550,11 @@ FRAGMENT;
       $settingsFragment = 'undefined';
     }
     else {
-      $validKeys = array(
+      $validKeys = [
         self::OPEN_OPTION_METHOD,
         self::OPEN_OPTION_DATA,
         self::OPEN_OPTION_HEADERS,
-      );
+      ];
       $invalidKeys = $this->checkValidKeys($validKeys, $settings);
 
       if (count($invalidKeys) > 0) {
@@ -644,6 +593,71 @@ FRAGMENT;
     $this->script .= $fragment;
 
     return $this;
+  }
+
+
+  /**
+   * Runs the whole suite of steps
+   *
+   * @param boolean $preserveScript
+   */
+  public function run($preserveScript = false)
+  {
+    $fragment =
+<<<FRAGMENT
+  casper.run();
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    $filename = uniqid('casper-') . '.js';
+    FileSystem::write($filename, $this->script);
+
+    $options = '';
+    foreach ($this->options as $name => $value) {
+      $options .= ' --' . $name;
+
+      if (isset($value)) {
+        if (is_bool($value)) {
+          $value = $value ? 'yes' : 'no';
+        }
+
+        $options .= '=' . $value;
+      }
+    }
+
+    $commands = [
+        'export PATH=' . $this->getBinDir() . ':$PATH',
+        'casperjs ' . $filename . $options,
+    ];
+
+    $fp = popen(implode('; ', $commands), 'r');
+    while (!feof($fp)) {
+      $line = fread($fp, 1024);
+
+      // remove line with message of PhantomJS bug
+      if (Strings::contains($line, 'Unsafe JavaScript attempt to access frame')) {
+        continue;
+      }
+
+      $line = Strings::replace($line, '[\[phantom\] |\[remote\] ]');
+      $line = Strings::normalizeNewLines($line);
+
+      $this->output[] = $line;
+
+      if (!$this->isDebug() && Strings::contains($line, '[debug]')) {
+        continue;
+      }
+
+      echo $line;
+      flush();
+    }
+    fclose($fp);
+    $this->logOutput();
+
+    if (!$preserveScript) {
+      FileSystem::delete($filename);
+    }
   }
 
 
@@ -700,7 +714,6 @@ FRAGMENT;
    * @param array|null $options See constants Casper::SEND_KEYS_OPTION_*
    * @return \Canterville\Casper
    * @throws \Canterville\InvalidArgumentException
-   *
    * Options values:
    *  - RESET: boolean
    *  - KEEP_FOCUS: boolean
@@ -794,71 +807,6 @@ OPENFRAGMENT;
 
 
   /**
-   * Runs the whole suite of steps
-   *
-   * @param boolean $preserveScript
-   */
-  public function run($preserveScript = false)
-  {
-    $fragment =
-<<<FRAGMENT
-  casper.run();
-FRAGMENT;
-
-    $this->script .= $fragment;
-
-    $filename = uniqid('casper-') . '.js';
-    FileSystem::write($filename, $this->script);
-
-    $options = '';
-    foreach ($this->options as $name => $value) {
-      $options .= ' --' . $name;
-
-      if (isset($value)) {
-        if (is_bool($value)) {
-          $value = $value ? 'yes' : 'no';
-        }
-
-        $options .= '=' . $value;
-      }
-    }
-
-    $commands = array(
-      'export PATH=' . $this->getBinDir() . ':$PATH',
-      'casperjs ' . $filename . $options,
-    );
-
-    $fp = popen(implode('; ', $commands), 'r');
-    while (!feof($fp)) {
-      $line = fread($fp, 1024);
-
-      // remove line with message of PhantomJS bug
-      if (Strings::contains($line, 'Unsafe JavaScript attempt to access frame')) {
-        continue;
-      }
-
-      $line = Strings::replace($line, '[\[phantom\] |\[remote\] ]');
-      $line = Strings::normalizeNewLines($line);
-
-      $this->output[] = $line;
-
-      if (!$this->isDebug() && Strings::contains($line, '[debug]')) {
-        continue;
-      }
-
-      echo $line;
-      flush();
-    }
-    fclose($fp);
-    $this->logOutput();
-
-    if (!$preserveScript) {
-      FileSystem::delete($filename);
-    }
-  }
-
-
-  /**
    * Pause steps suite execution for a given amount of time
    *
    * @param int $seconds
@@ -873,35 +821,6 @@ FRAGMENT;
   casper.wait($secondsFragment, function() {
     this.echo('[wait] time $seconds sec occurred');
   });
-
-FRAGMENT;
-
-    $this->script .= $fragment;
-
-    return $this;
-  }
-
-
-  /**
-   * Waits for the current page url to match the provided argument
-   *
-   * @param string $url Javascript regular expression
-   * @param null|int $maxSeconds
-   * @return \Canterville\Casper
-   */
-  public function waitForUrl($url, $maxSeconds = null)
-  {
-    $timeoutFragment = isset($maxSeconds) ? $maxSeconds * 1000 : 'undefined';
-
-    $fragment =
-<<<FRAGMENT
-  casper.waitForUrl(/$url/,
-    function() {
-      this.echo('[waitForUrl] redirected to "$url"');
-    },
-    function() {
-      this.echo('[waitForUrl] time for wait on URL "$url" occurred');
-    }, $timeoutFragment);
 
 FRAGMENT;
 
@@ -966,6 +885,89 @@ FRAGMENT;
     $this->script .= $fragment;
 
     return $this;
+  }
+
+
+  /**
+   * Waits for the current page url to match the provided argument
+   *
+   * @param string $url Javascript regular expression
+   * @param null|int $maxSeconds
+   * @return \Canterville\Casper
+   */
+  public function waitForUrl($url, $maxSeconds = null)
+  {
+    $timeoutFragment = isset($maxSeconds) ? $maxSeconds * 1000 : 'undefined';
+
+    $fragment =
+<<<FRAGMENT
+  casper.waitForUrl(/$url/,
+    function() {
+      this.echo('[waitForUrl] redirected to "$url"');
+    },
+    function() {
+      this.echo('[waitForUrl] time for wait on URL "$url" occurred');
+    }, $timeoutFragment);
+
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /************************** HELPERS **************************/
+
+  /**
+   * Clear the current CasperJS script
+   */
+  private function clean()
+  {
+    $this->output = [];
+    $this->requestedUrls = [];
+    $this->currentUrl = null;
+    $this->script = '';
+  }
+
+
+  /**
+   * Logging output
+   */
+  private function logOutput()
+  {
+    foreach ($this->output as $outputLine) {
+      if (Strings::contains($outputLine, 'Navigation requested')) {
+        $frag0 = explode('Navigation requested: url=', $outputLine);
+        $frag1 = explode(', type=', $frag0[1]);
+        $this->requestedUrls[] = $frag1[0];
+      }
+
+      foreach ($this->onLog as $debugFunction) {
+        call_user_func($debugFunction, $outputLine);
+      }
+    }
+  }
+
+
+  /**
+   * Check if it's all keys in array are valid
+   *
+   * @param array $validKeys
+   * @param array $field
+   * @return array
+   */
+  private function checkValidKeys(array $validKeys, array $field)
+  {
+    $invalidKeys = [];
+
+    foreach ($field as $key => $value) {
+      if (!in_array($key, $validKeys)) {
+        $invalidKeys[] = $key;
+      }
+    }
+
+    return $invalidKeys;
   }
 
 }
