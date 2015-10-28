@@ -50,7 +50,7 @@ class Casper
 
 
   // array of functions that run if is debug, one argument is message
-  public $onDebug = array();
+  public $onLog = array();
 
   public $currentUrl;
 
@@ -208,9 +208,9 @@ class Casper
 
 
   /**
-   * Processing output and debug
+   * Logging output
    */
-  private function processOutput()
+  private function logOutput()
   {
     foreach ($this->output as $outputLine) {
       if (Strings::contains($outputLine, 'Navigation requested')) {
@@ -219,10 +219,8 @@ class Casper
         $this->requestedUrls[] = $frag1[0];
       }
 
-      if ($this->isDebug()) {
-        foreach ($this->onDebug as $debugFunction) {
-          call_user_func($debugFunction, $outputLine);
-        }
+      foreach ($this->onLog as $debugFunction) {
+        call_user_func($debugFunction, $outputLine);
       }
     }
   }
@@ -841,6 +839,7 @@ FRAGMENT;
 
       $line = Strings::replace($line, '[\[phantom\] |\[remote\] ]');
       $line = Strings::normalizeNewLines($line);
+
       $this->output[] = $line;
 
       if (!$this->isDebug() && Strings::contains($line, '[debug]')) {
@@ -851,7 +850,7 @@ FRAGMENT;
       flush();
     }
     fclose($fp);
-    $this->processOutput();
+    $this->logOutput();
 
     if (!$preserveScript) {
       FileSystem::delete($filename);
