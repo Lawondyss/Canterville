@@ -605,46 +605,7 @@ FRAGMENT;
     $filename = uniqid('casper-') . '.js';
     FileSystem::write($filename, $this->script);
 
-    $options = '';
-    foreach ($this->options as $name => $value) {
-      $options .= ' --' . $name;
-
-      if (isset($value)) {
-        if (is_bool($value)) {
-          $value = $value ? 'yes' : 'no';
-        }
-
-        $options .= '=' . $value;
-      }
-    }
-
-    $commands = [
-        'export PATH=' . $this->getBinDir() . ':$PATH',
-        'casperjs ' . $filename . $options,
-    ];
-
-    $fp = popen(implode('; ', $commands), 'r');
-    while (!feof($fp)) {
-      $line = fread($fp, 1024);
-
-      // remove line with message of PhantomJS bug
-      if (Strings::contains($line, 'Unsafe JavaScript attempt to access frame')) {
-        continue;
-      }
-
-      $line = Strings::replace($line, '[\[phantom\] |\[remote\] ]');
-      $line = Strings::normalizeNewLines($line);
-
-      $this->output[] = $line;
-
-      if (!$this->isDebug() && Strings::contains($line, '[debug]')) {
-        continue;
-      }
-
-      echo $line;
-      flush();
-    }
-    fclose($fp);
+    $this->doRun($filename);
     $this->logOutput();
 
     if (!$preserveScript) {
@@ -1001,6 +962,84 @@ FRAGMENT;
     }
 
     return $invalidKeys;
+  }
+
+
+  /**
+   * Run CasperJS and output result
+   *
+   * @param string $filename
+   */
+  private function doRun($filename)
+  {
+    $command = $this->getCommand($filename);
+
+    $fp = popen($command, 'r');
+    while (!feof($fp)) {
+      $line = fread($fp, 1024);
+
+      // skip line with message of PhantomJS bug
+      if (Strings::contains($line, 'Unsafe JavaScript attempt to access frame')) {
+        continue;
+      }
+
+      $line = Strings::replace($line, '[\[phantom\] |\[remote\] ]');
+      $line = Strings::normalizeNewLines($line);
+
+      $this->output[] = $line;
+
+      // skip line with debug information for non-debug run
+      if (!$this->isDebug() && Strings::contains($line, '[debug]')) {
+        continue;
+      }
+
+      echo $line;
+      flush();
+    }
+    fclose($fp);
+  }
+
+
+  /**
+   * Returns command for run
+   *
+   * @param string $filename
+   * @return string
+   */
+  private function getCommand($filename)
+  {
+    $options = $this->getCommandOptions();
+
+    $commands = [
+        'export PATH=' . $this->getBinDir() . ':$PATH',
+        'casperjs ' . $filename . $options,
+    ];
+
+    return implode(';', $commands);
+  }
+
+
+  /**
+   * Returns options for command
+   *
+   * @return string
+   */
+  private function getCommandOptions()
+  {
+    $options = '';
+    foreach ($this->options as $name => $value) {
+      $options .= ' --' . $name;
+
+      if (isset($value)) {
+        if (is_bool($value)) {
+          $value = $value ? 'yes' : 'no';
+        }
+
+        $options .= '=' . $value;
+      }
+    }
+
+    return $options;
   }
 
 }
