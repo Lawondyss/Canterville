@@ -842,6 +842,11 @@ FRAGMENT;
       $line = Strings::replace($line, '[\[phantom\] |\[remote\] ]');
       $line = Strings::normalizeNewLines($line);
       $this->output[] = $line;
+
+      if (!$this->isDebug() && Strings::contains($line, '[debug]')) {
+        continue;
+      }
+
       echo $line;
       flush();
     }
