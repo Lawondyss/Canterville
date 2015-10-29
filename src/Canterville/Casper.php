@@ -49,6 +49,11 @@ class Casper
   const CAPTURE_OPTION_FORMAT = 'format';
   const CAPTURE_OPTION_QUALITY = 'quality';
 
+  const LOG_LEVEL_DEBUG = 'debug';
+  const LOG_LEVEL_INFO = 'info';
+  const LOG_LEVEL_WARNING = 'warning';
+  const LOG_LEVEL_ERROR = 'error';
+
 
   // array of functions that run if is debug, one argument is message
   public $onLog = [];
@@ -56,8 +61,6 @@ class Casper
   public $currentUrl;
 
   public $currentTitle;
-
-  private $debug = false;
 
   private $userAgent = 'casper';
 
@@ -69,7 +72,9 @@ class Casper
 
   private $script = '';
 
-  private $options = [];
+  private $options = [
+    'log-level' => 'info',
+  ];
 
 
   /************************** GETTERS AND SETTERS **************************/
@@ -78,20 +83,11 @@ class Casper
    * @param boolean $debug
    * @return \Canterville\Casper
    */
-  public function setDebug($debug = true)
+  public function setLogLevel($logLevel)
   {
-    $this->debug = (bool)$debug;
+    $this->options['log-level'] = $logLevel;
 
     return $this;
-  }
-
-
-  /**
-   * @return bool
-   */
-  public function isDebug()
-  {
-    return $this->debug;
   }
 
 
@@ -988,14 +984,10 @@ FRAGMENT;
 
       $this->output[] = $line;
 
-      // skip line with debug information for non-debug run
-      if (!$this->isDebug() && Strings::contains($line, '[debug]')) {
-        continue;
-      }
-
       echo $line;
       flush();
     }
+    echo PHP_EOL;
     fclose($fp);
   }
 
