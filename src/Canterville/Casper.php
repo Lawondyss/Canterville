@@ -970,6 +970,8 @@ FRAGMENT;
   {
     $command = $this->getCommand($filename);
 
+    echo $this->getInfoHeader($command);
+
     $fp = popen($command, 'r');
     while (!feof($fp)) {
       $line = fread($fp, 1024);
@@ -1032,6 +1034,35 @@ FRAGMENT;
     }
 
     return $options;
+  }
+
+
+  /**
+   * Returns header of run Canterville
+   *
+   * @param string $command
+   * @return string
+   */
+  private function getInfoHeader($command)
+  {
+    list(, $casperCommand) = explode(';', $command);
+    $values = Json::decode(file_get_contents(__DIR__ . '/../../composer.json'));
+    $version = $values->version;
+
+    $infoHeader =
+<<< HEADER
+   ____            _                  _ _ _
+  / ___|__ _ _ __ | |_ ___ _ ____   _(_) | | ___
+ | |   / _` | '_ \| __/ _ \ '__\ \ / / | | |/ _ \
+ | |__| (_| | | | | ||  __/ |   \ V /| | | |  __/
+  \____\__,_|_| |_|\__\___|_|    \_/ |_|_|_|\___| v$version
+
+run $casperCommand
+
+
+HEADER;
+
+    return $infoHeader;
   }
 
 }

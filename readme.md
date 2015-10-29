@@ -5,10 +5,11 @@ Both libraries is auto installed.
 
 Installation
 ------------
-Over Composer `require lawondyss/canterville:dev-master`.
-
-After installation include to your composer.json file this code:
+Over Composer. Include to your composer.json file this code:
 ```json
+  "required": {
+    "lawondyss/canterville": "0.2"
+  },
   "scripts": {
     "post-install-cmd": [
       "Canterville\\Installer::install"
