@@ -17,7 +17,7 @@ class PhantomInstaller extends BaseInstaller
     $this->name = 'PhantomJS';
     $this->version = '1.9.8';
     $this->url = $this->getUrl($this->version);
-    $this->distType = $this->getDistType($this->distType);
+    $this->distType = $this->getDistType($this->url);
     $this->targetDir = 'vendor/lawondyss/phantomjs';
 
     parent::init();
@@ -98,7 +98,7 @@ class PhantomInstaller extends BaseInstaller
     
     if ($url === false) {
       $msg = 'The Installer could not select a PhantomJS package for this OS.' .
-        'Please install PhantomJS manually into the /bin folder of your project.';
+        'Please install PhantomJS manually into the "/vendor/bin" folder of your project.';
       throw new RuntimeException($msg);
     }
 
