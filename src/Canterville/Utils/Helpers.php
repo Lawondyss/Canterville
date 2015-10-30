@@ -6,6 +6,8 @@
 
 namespace Canterville\Utils;
 
+use Nette\Utils\Json;
+
 class Helpers
 {
   const OS_MAC = 'macosx';
@@ -59,5 +61,33 @@ class Helpers
     }
 
     return $bitSize;
+  }
+
+
+  /**
+   * Returns argument prepared for used in JS script
+   *
+   * @param mixed $argument
+   * @return mixed
+   */
+  public static function prepareArgument($argument)
+  {
+    switch (gettype($argument)) {
+      case 'array':
+      case 'object':
+        $argument = Json::encode($argument, Json::PRETTY);
+        break;
+      case 'string':
+        $argument = "'$argument'";
+        break;
+      case 'boolean':
+        $argument = $argument ? 'true' : 'false';
+        break;
+      case 'NULL':
+        $argument = 'undefined';
+        break;
+    }
+
+    return $argument;
   }
 }
