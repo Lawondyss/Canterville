@@ -9,6 +9,7 @@ namespace Canterville\Installers;
 
 use Canterville\RuntimeException;
 use Canterville\Utils\Helpers;
+use Nette\Utils\FileSystem;
 
 class SlimerInstaller extends BaseInstaller
 {
@@ -33,10 +34,8 @@ class SlimerInstaller extends BaseInstaller
    */
   protected function copyToBinFolder($binDir)
   {
-    if (!is_dir($binDir)) {
-      mkdir($binDir);
-    }
-    
+    FileSystem::createDir($binDir);
+
     $os = Helpers::getOS();
     
       $source = '/slimerjs.bat';

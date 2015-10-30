@@ -7,6 +7,8 @@
 
 namespace Canterville\Installers;
 
+use Nette\Utils\FileSystem;
+
 class CasperInstaller extends BaseInstaller
 {
   protected function init()
@@ -24,9 +26,7 @@ class CasperInstaller extends BaseInstaller
    */
   protected function copyToBinFolder($binDir)
   {
-    if (!is_dir($binDir)) {
-      mkdir($binDir);
-    }
+    FileSystem::createDir($binDir);
 
     $source = __DIR__ . '/../../../' . $this->targetDir . '/bin/casperjs';
     $target = $binDir . '/casperjs';
