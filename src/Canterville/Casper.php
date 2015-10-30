@@ -8,6 +8,7 @@
 
 namespace Canterville;
 
+use Canterville\Utils\Helpers;
 use Nette\Utils\Json;
 use Nette\Utils\Strings;
 use Nette\Utils\FileSystem;
@@ -54,6 +55,9 @@ class Casper
   const LOG_LEVEL_WARNING = 'warning';
   const LOG_LEVEL_ERROR = 'error';
 
+  const ENGINE_SLIMMERJS = 'slimerjs';
+  const ENGINE_PHANTOMJS = 'phantomjs';
+
 
   // array of functions that run if is debug, one argument is message
   public $onLog = [];
@@ -73,19 +77,42 @@ class Casper
   private $script = '';
 
   private $options = [
-    'log-level' => 'info',
+    'log-level' => self::LOG_LEVEL_INFO,
+    'engine' => self::ENGINE_PHANTOMJS,
   ];
 
 
   /************************** GETTERS AND SETTERS **************************/
 
   /**
-   * @param boolean $debug
+   * @param string $logLevel
    * @return \Canterville\Casper
    */
   public function setLogLevel($logLevel)
   {
     $this->options['log-level'] = $logLevel;
+
+    return $this;
+  }
+
+
+  /**
+   * @return string
+   * @throws \Canterville\NonExistsException
+   */
+  public function getLogLevel()
+  {
+    return $this->getOption('log-level');
+  }
+
+
+  /**
+   * @param string $engine
+   * @return \Canterville\Casper
+   */
+  public function setEngine($engine)
+  {
+    $this->setOption('engine', $engine);
 
     return $this;
   }
@@ -193,6 +220,22 @@ class Casper
     $this->options[$name] = $value;
 
     return $this;
+  }
+
+
+  /**
+   * @param string $name
+   * @return mixed
+   * @throws \Canterville\NonExistsException
+   */
+  public function getOption($name)
+  {
+    if (!array_key_exists($name, $this->options)) {
+      $msg = sprintf('Option "%s" not set.', $name);
+      throw new NonExistsException($msg);
+    }
+    
+    return $this->options[$name];
   }
 
 
@@ -976,8 +1019,13 @@ FRAGMENT;
     while (!feof($fp)) {
       $line = fread($fp, 1024);
 
-      // skip line with message of PhantomJS bug
-      if (Strings::contains($line, 'Unsafe JavaScript attempt to access frame')) {
+      // skip line with message of PhantomJS bug for non-debug level
+      if ($this->getLogLevel() !== self::LOG_LEVEL_DEBUG && Strings::contains($line, 'Unsafe JavaScript attempt to access frame')) {
+        continue;
+      }
+
+      // skip JS strict warnings for non-debug level
+      if ($this->getLogLevel() !== self::LOG_LEVEL_DEBUG && Strings::contains($line, 'JavaScript strict warning:')) {
         continue;
       }
 
@@ -990,7 +1038,7 @@ FRAGMENT;
       flush();
     }
     echo PHP_EOL;
-    fclose($fp);
+    pclose($fp);
   }
 
 
@@ -1002,12 +1050,29 @@ FRAGMENT;
    */
   private function getCommand($filename)
   {
-    $options = $this->getCommandOptions();
+    $commands = [];
 
-    $commands = [
-        'export PATH=' . $this->getBinDir() . ':$PATH',
-        'casperjs ' . $filename . $options,
-    ];
+    // Canterville binaries has higher priority as user binaries
+    $commands[] = 'export PATH=' . $this->getBinDir() . ':$PATH';
+
+    // SlimJS required set path to Firefox
+    if ($this->getOption('engine') === self::ENGINE_SLIMMERJS) {
+      switch (Helpers::getOS()) {
+        case Helpers::OS_MAC:
+          $commands[] = 'export SLIMERJSLAUNCHER=/Applications/Firefox.app/Contents/MacOS/firefox';
+          break;
+        case Helpers::OS_WINDOWS:
+          $commands[] = 'SET SLIMERJSLAUNCHER="c:\Program Files\Mozilla Firefox\firefox.exe';
+          break;
+        case Helpers::OS_LINUX:
+          $commands[] = 'export SLIMERJSLAUNCHER=/usr/bin/firefox';
+          break;
+      }
+    }
+
+    // run script on CasperJS with options
+    $options = $this->getCommandOptions();
+    $commands[] = 'casperjs ' . $filename . $options;
 
     return implode(';', $commands);
   }
@@ -1045,7 +1110,10 @@ FRAGMENT;
    */
   private function getInfoHeader($command)
   {
-    list(, $casperCommand) = explode(';', $command);
+    // casper command is last
+    $commands = array_reverse(explode(';', $command));
+    $casperCommand = array_shift($commands);
+
     $values = Json::decode(file_get_contents(__DIR__ . '/../../composer.json'));
     $version = $values->version;
 
@@ -1057,7 +1125,7 @@ FRAGMENT;
  | |__| (_| | | | | ||  __/ |   \ V /| | | |  __/
   \____\__,_|_| |_|\__\___|_|    \_/ |_|_|_|\___| v$version
 
-run $casperCommand
+run CasperJS: $casperCommand
 
 
 HEADER;

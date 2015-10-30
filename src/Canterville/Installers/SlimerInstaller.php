@@ -12,20 +12,20 @@ use Canterville\Utils\Cli;
 use Canterville\Utils\Helpers;
 use Nette\Utils\FileSystem;
 
-class PhantomInstaller extends BaseInstaller
+class SlimerInstaller extends BaseInstaller
 {
 
   protected function init()
   {
-    $this->name = 'PhantomJS';
-    $this->version = '1.9.8';
+    $this->name = 'SlimerJS';
+    $this->version = '0.9.6';
 
     parent::init();
   }
 
 
   /**
-   * Copies the PhantomJS binary to the bin folder
+   * Copies the SlimerJS binary to the bin folder
    *
    * @param string $binDir
    * @throws \Canterville\RuntimeException
@@ -37,15 +37,15 @@ class PhantomInstaller extends BaseInstaller
     $os = Helpers::getOS();
     
     if ($os === Helpers::OS_WINDOWS) {
-      $source = '/phantomjs.exe';
-      $target = $binDir . '/phantomjs.exe';
+      $source = $this->targetDir . '/slimerjs.bat';
+      $target = $binDir . '/slimerjs.bat';
     }
     elseif (isset($os)) {
-      $source = '/bin/phantomjs';
-      $target = $binDir . '/phantomjs';
+      $source = $this->targetDir . '/slimerjs';
+      $target = $binDir . '/slimerjs';
     }
     else {
-      throw new RuntimeException('Cannot copy binary file of PhantomJS. OS not detect.');
+      throw new RuntimeException('Cannot copy binary file of SlimerJS. OS not detect.');
     }
 
     Cli::makeSymbolicLink($source, $target);
@@ -61,12 +61,12 @@ class PhantomInstaller extends BaseInstaller
    */
   protected function getUrl($version)
   {
-    $url = 'https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-' . $version;
+    $url = 'http://download.slimerjs.org/releases/0.9.6/slimerjs-' . $version;
     $os = Helpers::getOS();
 
     switch ($os) {
       case Helpers::OS_WINDOWS:
-        $url .= '-windows.zip';
+        $url .= '-win32.zip';
         break;
 
       case Helpers::OS_LINUX:
@@ -85,7 +85,7 @@ class PhantomInstaller extends BaseInstaller
         break;
 
       case Helpers::OS_MAC:
-        $url .= '-macosx.zip';
+        $url .= '-mac.tar.bz2';
         break;
 
       default:
@@ -94,8 +94,8 @@ class PhantomInstaller extends BaseInstaller
     }
     
     if ($url === false) {
-      $msg = 'The Installer could not select a PhantomJS package for this OS.' .
-        'Please install PhantomJS manually into the "/vendor/bin" folder of your project.';
+      $msg = 'The Installer could not select a SlimerJS package for this OS.' .
+        'Please install SlimerJS manually into the "/vendor/bin" folder of your project.';
       throw new RuntimeException($msg);
     }
 

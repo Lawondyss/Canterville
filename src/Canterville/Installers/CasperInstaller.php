@@ -7,32 +7,49 @@
 
 namespace Canterville\Installers;
 
+use Canterville\Utils\Cli;
+use Nette\Utils\FileSystem;
+
 class CasperInstaller extends BaseInstaller
 {
   protected function init()
   {
     $this->name = 'CasperJS';
     $this->version = '1.1-beta3';
-    $this->url = 'https://github.com/n1k0/casperjs/zipball/' . $this->version;
-    $this->distType = 'zip';
-    $this->targetDir = 'vendor/lawondyss/casperjs';
+
+    parent::init();
   }
 
 
   /**
-   * Make link on the CasperJS to the bin folder.
+   * @inheritdoc
    */
   protected function copyToBinFolder($binDir)
   {
-    if (!is_dir($binDir)) {
-      mkdir($binDir);
-    }
+    FileSystem::createDir($binDir);
 
-    $source = __DIR__ . '/../../../' . $this->targetDir . '/bin/casperjs';
+    $source = $this->targetDir . '/bin/casperjs';
     $target = $binDir . '/casperjs';
-    $command = 'ln -sf ' . $source . ' ' . $target;
 
-    exec($command);
-    chmod($target, 0755);
+    Cli::makeSymbolicLink($source, $target);
+  }
+
+
+  /**
+   * @inheritdoc
+   */
+  protected function getUrl($version)
+  {
+    return 'https://github.com/n1k0/casperjs/zipball/' . $version;
+  }
+
+
+  /**
+   * @param string $url
+   * @return string
+   */
+  protected function getDistType($url)
+  {
+    return 'zip';
   }
 }

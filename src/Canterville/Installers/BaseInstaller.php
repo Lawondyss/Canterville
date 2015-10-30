@@ -12,9 +12,13 @@ use Canterville\NotSetException;
 use Composer\Composer;
 use Composer\Package\Package;
 use Composer\Package\Version\VersionParser;
+use Nette\Utils\Strings;
 
 abstract class BaseInstaller
 {
+  const AUTHOR_DIR = 'lawondyss/';
+
+
   protected $name;
 
   protected $version;
@@ -25,6 +29,8 @@ abstract class BaseInstaller
 
   protected $targetDir;
 
+  private $vendorDir;
+
 
   /**
    * Installation package
@@ -34,7 +40,7 @@ abstract class BaseInstaller
   public function install(Composer $composer)
   {
     $this->init();
-    
+
     /* Create Composer in-memory package */
     $versionParser = new VersionParser;
     $normVersion = $versionParser->normalize($this->version);
@@ -63,6 +69,10 @@ abstract class BaseInstaller
    */
   protected function init()
   {
+    $this->url = $this->getUrl($this->version);
+    $this->distType = $this->getDistType($this->url);
+    $this->targetDir = $this->getVendorDir() . self::AUTHOR_DIR . Strings::lower($this->name) . '/';
+
     $calledClass = get_called_class();
 
     if (!method_exists($calledClass, 'copyToBinFolder')) {
@@ -85,6 +95,49 @@ abstract class BaseInstaller
     if (!isset($this->targetDir)) {
       throw new NotSetException($errorMsg, 'targetDir');
     }
+  }
+
+
+  /**
+   * Returns URL for download library
+   *
+   * @param string $version
+   * @return string
+   */
+  abstract protected function getUrl($version);
+
+
+  /**
+   * Copy binary of library to directory of binaries
+   *
+   * @param string $binDir
+   */
+  abstract protected function copyToBinFolder($binDir);
+
+
+  /**
+   * @param string $url
+   * @return string
+   */
+  protected function getDistType($url)
+  {
+    $distType = pathinfo($url, PATHINFO_EXTENSION) === 'zip' ? 'zip' : 'tar';
+
+    return $distType;
+  }
+
+
+  /**
+   * @return string
+   */
+  protected function getVendorDir()
+  {
+    if (!isset($this->vendorDir)) {
+      $vendorDir = __DIR__ . '/../../../vendor';
+      $this->vendorDir = realpath($vendorDir) . '/';
+    }
+
+    return $this->vendorDir;
   }
 
 }
