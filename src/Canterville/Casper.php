@@ -1068,6 +1068,26 @@ FRAGMENT;
   }
 
 
+  /**
+   * Writes current page title to output
+   *
+   * @return $this
+   */
+  public function writeTitle()
+  {
+    $fragment =
+<<<FRAGMETN
+  casper.then(function() {
+    this.echo("[title] " + this.getTitle());
+  });
+FRAGMETN;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
   /************************** HELPERS **************************/
 
   /**
