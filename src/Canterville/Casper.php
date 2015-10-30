@@ -1067,6 +1067,26 @@ FRAGMENT;
 
 
   /**
+   * Retrieves current page URL
+   * That the url will be url-decoded
+   *
+   * @return $this
+   */
+  public function writeCurrentUrl()
+  {
+    $fragment = <<<FRAGMENT
+  casper.then(function() {
+    this.echo(this.getCurrentUrl());
+  });
+FRAGMENT;
+
+    $this->addFragment($fragment);
+
+    return $this;
+  }
+
+
+  /**
    * Retrieves text contents matching a given selector expression
    * If you provide one matching more than one element, their textual contents will be concatenated
    *
