@@ -8,6 +8,7 @@
 namespace Canterville\Installers;
 
 use Canterville\RuntimeException;
+use Canterville\Utils\Helpers;
 
 class SlimerInstaller extends BaseInstaller
 {
@@ -36,10 +37,10 @@ class SlimerInstaller extends BaseInstaller
       mkdir($binDir);
     }
     
-    $os = $this->getOS();
+    $os = Helpers::getOS();
     
-    if ($os === 'windows') {
       $source = '/slimerjs.bat';
+    if ($os === Helpers::OS_WINDOWS) {
       $target = $binDir . '/slimerjs.bat';
     }
     elseif (isset($os)) {
@@ -70,20 +71,20 @@ class SlimerInstaller extends BaseInstaller
   protected function getUrl($version)
   {
     $url = 'http://download.slimerjs.org/releases/0.9.6/slimerjs-' . $version;
-    $os = $this->getOS();
+    $os = Helpers::getOS();
 
     switch ($os) {
-      case 'windows':
+      case Helpers::OS_WINDOWS:
         $url .= '-win32.zip';
         break;
 
-      case 'linux':
-        $bitSize = $this->getBitSize();
+      case Helpers::OS_LINUX:
+        $bitSize = Helpers::getBitSize();
         switch ($bitSize) {
-          case 32:
+          case Helpers::BIT_32:
             $url .= '-linux-i686.tar.bz2';
             break;
-          case 64:
+          case Helpers::BIT_64:
             $url .= '-linux-x86_64.tar.bz2';
             break;
           default:
@@ -92,7 +93,7 @@ class SlimerInstaller extends BaseInstaller
         }
         break;
 
-      case 'macosx':
+      case Helpers::OS_MAC:
         $url .= '-mac.tar.bz2';
         break;
 

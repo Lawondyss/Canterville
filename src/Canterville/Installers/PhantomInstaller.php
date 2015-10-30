@@ -8,6 +8,7 @@
 namespace Canterville\Installers;
 
 use Canterville\RuntimeException;
+use Canterville\Utils\Helpers;
 
 class PhantomInstaller extends BaseInstaller
 {
@@ -36,9 +37,9 @@ class PhantomInstaller extends BaseInstaller
       mkdir($binDir);
     }
     
-    $os = $this->getOS();
+    $os = Helpers::getOS();
     
-    if ($os === 'windows') {
+    if ($os === Helpers::OS_WINDOWS) {
       $source = '/phantomjs.exe';
       $target = $binDir . '/phantomjs.exe';
     }
@@ -65,20 +66,20 @@ class PhantomInstaller extends BaseInstaller
   protected function getUrl($version)
   {
     $url = 'https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-' . $version;
-    $os = $this->getOS();
+    $os = Helpers::getOS();
 
     switch ($os) {
-      case 'windows':
+      case Helpers::OS_WINDOWS:
         $url .= '-windows.zip';
         break;
 
-      case 'linux':
-        $bitSize = $this->getBitSize();
+      case Helpers::OS_LINUX:
+        $bitSize = Helpers::getBitSize();
         switch ($bitSize) {
-          case 32:
+          case Helpers::BIT_32:
             $url .= '-linux-i686.tar.bz2';
             break;
-          case 64:
+          case Helpers::BIT_64:
             $url .= '-linux-x86_64.tar.bz2';
             break;
           default:
@@ -87,7 +88,7 @@ class PhantomInstaller extends BaseInstaller
         }
         break;
 
-      case 'macosx':
+      case Helpers::OS_MAC:
         $url .= '-macosx.zip';
         break;
 

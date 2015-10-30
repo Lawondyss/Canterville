@@ -34,7 +34,7 @@ abstract class BaseInstaller
   public function install(Composer $composer)
   {
     $this->init();
-    
+
     /* Create Composer in-memory package */
     $versionParser = new VersionParser;
     $normVersion = $versionParser->normalize($this->version);
@@ -106,44 +106,14 @@ abstract class BaseInstaller
 
 
   /**
-   * @return null|string
+   * @param string $url
+   * @return string
    */
-  protected function getOS()
+  protected function getDistType($url)
   {
-    $os = null;
-    $uname = strtolower(php_uname());
+    $distType = pathinfo($url, PATHINFO_EXTENSION) === 'zip' ? 'zip' : 'tar';
 
-    if (strpos($uname, 'darwin') !== false) {
-      $os = 'macosx';
-    }
-    elseif (strpos($uname, 'win') !== false) {
-      $os = 'windows';
-    }
-    elseif (strpos($uname, 'linux') !== false) {
-      $os = 'linux';
-    }
-
-    return $os;
-  }
-
-
-  /**
-   * @return int|null
-   */
-  protected function getBitSize()
-  {
-    switch (PHP_INT_SIZE) {
-      case 4:
-        $bitSize = 32;
-        break;
-      case 8:
-        $bitSize = 64;
-        break;
-      default:
-        $bitSize = null;
-    }
-
-    return $bitSize;
+    return $distType;
   }
 
 
