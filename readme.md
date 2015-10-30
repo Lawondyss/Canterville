@@ -1,21 +1,38 @@
 Canterville
 ===========
-Canterville is library for work with web pages without browser. Browser here is PhantomJS controlled using CasperJS.
-Both libraries is auto installed.
+Canterville is library for work with web pages without browser. Browser here is [PhantomJS] or [SlimerJS] controlled using [CasperJS].
+All libraries is auto installed.
+
+**WARNING:**
+SlimerJS required Firefox.
 
 Installation
 ------------
-Over Composer. Include to your composer.json file this code:
+Over Composer, `required lawondyss/canterville`.
+
+For installation PhantomJS, SlimmerJS and/or CasperJS include to your composer.json file code to section `scripts`.
+
+Example installation CasperJS with PhantomJS:
 ```json
-  "required": {
-    "lawondyss/canterville": "0.2"
-  },
   "scripts": {
     "post-install-cmd": [
-      "Canterville\\Installer::install"
+      "Canterville\\Installer::casperOnPhantom"
     ],
     "post-update-cmd": [
-      "Canterville\\Installer::install"
+      "Canterville\\Installer::casperOnPhantom"
     ]
   }
 ```
+
+### Options
+ - Installer::casperOnPhantom
+ - Installer::casperOnSlimer
+ - Installer::casper
+ - Installer::phantom
+ - Installer::slimer
+
+
+
+[PhantomJS]: http://phantomjs.org/
+[SlimerJS]: http://slimerjs.org/
+[CasperJS]: http://casperjs.org/
