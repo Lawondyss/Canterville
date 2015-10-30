@@ -1,13 +1,15 @@
 <?php
 /**
- * Class PhantomInstaller
  * @package Canterville\Installers
  * @author Ladislav Vondráček
  */
 
-namespace Canterville\Installers;
+namespace Canterville\Installer;
 
-use Canterville\RuntimeException;
+use Canterville\Exception\RuntimeException;
+use Canterville\Utils\Cli;
+use Canterville\Utils\Helpers;
+use Nette\Utils\FileSystem;
 
 class PhantomInstaller extends BaseInstaller
 {
@@ -16,9 +18,6 @@ class PhantomInstaller extends BaseInstaller
   {
     $this->name = 'PhantomJS';
     $this->version = '1.9.8';
-    $this->url = $this->getUrl($this->version);
-    $this->distType = $this->getDistType($this->url);
-    $this->targetDir = 'vendor/lawondyss/phantomjs';
 
     parent::init();
   }
@@ -28,17 +27,15 @@ class PhantomInstaller extends BaseInstaller
    * Copies the PhantomJS binary to the bin folder
    *
    * @param string $binDir
-   * @throws \Canterville\RuntimeException
+   * @throws \Canterville\Exception\RuntimeException
    */
   protected function copyToBinFolder($binDir)
   {
-    if (!is_dir($binDir)) {
-      mkdir($binDir);
-    }
+    FileSystem::createDir($binDir);
+
+    $os = Helpers::getOS();
     
-    $os = $this->getOS();
-    
-    if ($os === 'windows') {
+    if ($os === Helpers::OS_WINDOWS) {
       $source = '/phantomjs.exe';
       $target = $binDir . '/phantomjs.exe';
     }
@@ -50,8 +47,7 @@ class PhantomInstaller extends BaseInstaller
       throw new RuntimeException('Cannot copy binary file of PhantomJS. OS not detect.');
     }
 
-    copy($this->targetDir . $source, $target);
-    chmod($target, 0755);
+    Cli::makeSymbolicLink($source, $target);
   }
 
 
@@ -62,23 +58,23 @@ class PhantomInstaller extends BaseInstaller
    * @return string
    * @throws \Canterville\RuntimeException
    */
-  private function getUrl($version)
+  protected function getUrl($version)
   {
     $url = 'https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-' . $version;
-    $os = $this->getOS();
+    $os = Helpers::getOS();
 
     switch ($os) {
-      case 'windows':
+      case Helpers::OS_WINDOWS:
         $url .= '-windows.zip';
         break;
 
-      case 'linux':
-        $bitSize = $this->getBitSize();
+      case Helpers::OS_LINUX:
+        $bitSize = Helpers::getBitSize();
         switch ($bitSize) {
-          case 32:
+          case Helpers::BIT_32:
             $url .= '-linux-i686.tar.bz2';
             break;
-          case 64:
+          case Helpers::BIT_64:
             $url .= '-linux-x86_64.tar.bz2';
             break;
           default:
@@ -87,7 +83,7 @@ class PhantomInstaller extends BaseInstaller
         }
         break;
 
-      case 'macosx':
+      case Helpers::OS_MAC:
         $url .= '-macosx.zip';
         break;
 
@@ -103,60 +99,6 @@ class PhantomInstaller extends BaseInstaller
     }
 
     return $url;
-  }
-
-
-  /**
-   * @return null|string
-   */
-  private function getOS()
-  {
-    $os = null;
-    $uname = strtolower(php_uname());
-
-    if (strpos($uname, 'darwin') !== false) {
-      $os = 'macosx';
-    }
-    elseif (strpos($uname, 'win') !== false) {
-      $os = 'windows';
-    }
-    elseif (strpos($uname, 'linux') !== false) {
-      $os = 'linux';
-    }
-
-    return $os;
-  }
-
-
-  /**
-   * @return int|null
-   */
-  private function getBitSize()
-  {
-    switch (PHP_INT_SIZE) {
-      case 4:
-        $bitSize = 32;
-        break;
-      case 8:
-        $bitSize = 64;
-        break;
-      default:
-        $bitSize = null;
-    }
-
-    return $bitSize;
-  }
-
-
-  /**
-   * @param string $url
-   * @return string
-   */
-  private function getDistType($url)
-  {
-    $distType = pathinfo($url, PATHINFO_EXTENSION) === 'zip' ? 'zip' : 'tar';
-
-    return $distType;
   }
 
 }

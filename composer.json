@@ -1,8 +1,8 @@
 {
   "name": "lawondyss/canterville",
   "description": "A PHP headless browser.",
-  "version": "0.2",
-  "keywords": ["CasperJS", "PhantomJS", "Headless Browser"],
+  "version": "0.3",
+  "keywords": ["CasperJS", "PhantomJS", "SlimerJS", "Headless Browser"],
   "type": "library",
   "license": "BSD-2-Clause",
   "authors": [
@@ -22,6 +22,6 @@
     "psr-0": {
       "Canterville": "src/"
     },
-    "classmap": ["src/Canterville/Exceptions.php"]
+    "classmap": ["src/Canterville/Exception/exceptions.php"]
   }
 }
