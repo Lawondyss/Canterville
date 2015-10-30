@@ -83,6 +83,8 @@ class Casper
     'engine' => self::ENGINE_PHANTOMJS,
   ];
 
+  private $useFsModule = false;
+
 
   /************************** GETTERS AND SETTERS **************************/
 
@@ -540,6 +542,53 @@ FRAGMENT;
 
 
   /**
+   * Retrieves HTML code from the current page
+   * By default, it outputs the whole page HTML contents
+   * If is specified file, save code, else write it to output
+   *
+   * @param null|string $filename
+   * @param null|string $selector
+   * @param bool|false $outer
+   * @return $this
+   */
+  public function getHTML($filename = null, $selector = null, $outer = false)
+  {
+    $selector = Helpers::prepareArgument($selector);
+    $outer = Helpers::prepareArgument($outer);
+
+    $fragmentGetHtml = "this.getHTML($selector, $outer)";
+
+    // write to output
+    if (!isset($filename)) {
+      $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    this.echo($fragmentGetHtml);
+  });
+FRAGMENT;
+    }
+    // save to file
+    else {
+      $this->useFsModule = true;
+
+      $filename = Helpers::prepareArgument($filename);
+
+      $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    fs.write($filename, $fragmentGetHtml);
+    this.echo("[save] HTML to $filename");
+  });
+FRAGMENT;
+    }
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
    * Triggers a mouse event on the first element found matching the provided selector
    *
    * @param string $selector
@@ -654,6 +703,16 @@ FRAGMENT;
 FRAGMENT;
 
     $this->script .= $fragment;
+
+    // for work with files must be required fs module
+    if ($this->useFsModule) {
+      $fragment =
+<<<FRAGMENT
+  var fs = require('fs');
+FRAGMENT;
+
+      $this->script = $fragment . $this->script;
+    }
 
     $filename = uniqid('casper-') . '.js';
     FileSystem::write($filename, $this->script);
