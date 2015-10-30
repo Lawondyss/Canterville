@@ -7,6 +7,7 @@
 
 namespace Canterville\Installers;
 
+use Canterville\Utils\Cli;
 use Nette\Utils\FileSystem;
 
 class CasperInstaller extends BaseInstaller
@@ -32,8 +33,7 @@ class CasperInstaller extends BaseInstaller
     $target = $binDir . '/casperjs';
     $command = 'ln -sf ' . $source . ' ' . $target;
 
-    exec($command);
-    chmod($target, 0755);
+    Cli::makeSymbolicLink($source, $target);
   }
 
 

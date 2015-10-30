@@ -8,6 +8,7 @@
 namespace Canterville\Installers;
 
 use Canterville\RuntimeException;
+use Canterville\Utils\Cli;
 use Canterville\Utils\Helpers;
 use Nette\Utils\FileSystem;
 
@@ -50,8 +51,7 @@ class PhantomInstaller extends BaseInstaller
       throw new RuntimeException('Cannot copy binary file of PhantomJS. OS not detect.');
     }
 
-    copy($this->targetDir . $source, $target);
-    chmod($target, 0755);
+    Cli::makeSymbolicLink($source, $target);
   }
 
 
