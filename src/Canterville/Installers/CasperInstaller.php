@@ -13,14 +13,14 @@ class CasperInstaller extends BaseInstaller
   {
     $this->name = 'CasperJS';
     $this->version = '1.1-beta3';
-    $this->url = 'https://github.com/n1k0/casperjs/zipball/' . $this->version;
+    $this->url = $this->getUrl($this->version);
     $this->distType = 'zip';
     $this->targetDir = 'vendor/lawondyss/casperjs';
   }
 
 
   /**
-   * Make link on the CasperJS to the bin folder.
+   * @inheritdoc
    */
   protected function copyToBinFolder($binDir)
   {
@@ -34,5 +34,14 @@ class CasperInstaller extends BaseInstaller
 
     exec($command);
     chmod($target, 0755);
+  }
+
+
+  /**
+   * @inheritdoc
+   */
+  protected function getUrl($version)
+  {
+    return 'https://github.com/n1k0/casperjs/zipball/' . $version;
   }
 }

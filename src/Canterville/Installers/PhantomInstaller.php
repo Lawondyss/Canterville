@@ -62,7 +62,7 @@ class PhantomInstaller extends BaseInstaller
    * @return string
    * @throws \Canterville\RuntimeException
    */
-  private function getUrl($version)
+  protected function getUrl($version)
   {
     $url = 'https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-' . $version;
     $os = $this->getOS();
@@ -103,60 +103,6 @@ class PhantomInstaller extends BaseInstaller
     }
 
     return $url;
-  }
-
-
-  /**
-   * @return null|string
-   */
-  private function getOS()
-  {
-    $os = null;
-    $uname = strtolower(php_uname());
-
-    if (strpos($uname, 'darwin') !== false) {
-      $os = 'macosx';
-    }
-    elseif (strpos($uname, 'win') !== false) {
-      $os = 'windows';
-    }
-    elseif (strpos($uname, 'linux') !== false) {
-      $os = 'linux';
-    }
-
-    return $os;
-  }
-
-
-  /**
-   * @return int|null
-   */
-  private function getBitSize()
-  {
-    switch (PHP_INT_SIZE) {
-      case 4:
-        $bitSize = 32;
-        break;
-      case 8:
-        $bitSize = 64;
-        break;
-      default:
-        $bitSize = null;
-    }
-
-    return $bitSize;
-  }
-
-
-  /**
-   * @param string $url
-   * @return string
-   */
-  private function getDistType($url)
-  {
-    $distType = pathinfo($url, PATHINFO_EXTENSION) === 'zip' ? 'zip' : 'tar';
-
-    return $distType;
   }
 
 }

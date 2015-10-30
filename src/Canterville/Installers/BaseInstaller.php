@@ -87,4 +87,75 @@ abstract class BaseInstaller
     }
   }
 
+
+  /**
+   * Returns URL for download library
+   *
+   * @param string $version
+   * @return string
+   */
+  abstract protected function getUrl($version);
+
+
+  /**
+   * Copy binary of library to directory of binaries
+   *
+   * @param string $binDir
+   */
+  abstract protected function copyToBinFolder($binDir);
+
+
+  /**
+   * @return null|string
+   */
+  protected function getOS()
+  {
+    $os = null;
+    $uname = strtolower(php_uname());
+
+    if (strpos($uname, 'darwin') !== false) {
+      $os = 'macosx';
+    }
+    elseif (strpos($uname, 'win') !== false) {
+      $os = 'windows';
+    }
+    elseif (strpos($uname, 'linux') !== false) {
+      $os = 'linux';
+    }
+
+    return $os;
+  }
+
+
+  /**
+   * @return int|null
+   */
+  protected function getBitSize()
+  {
+    switch (PHP_INT_SIZE) {
+      case 4:
+        $bitSize = 32;
+        break;
+      case 8:
+        $bitSize = 64;
+        break;
+      default:
+        $bitSize = null;
+    }
+
+    return $bitSize;
+  }
+
+
+  /**
+   * @param string $url
+   * @return string
+   */
+  protected function getDistType($url)
+  {
+    $distType = pathinfo($url, PATHINFO_EXTENSION) === 'zip' ? 'zip' : 'tar';
+
+    return $distType;
+  }
+
 }
