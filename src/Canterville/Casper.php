@@ -1067,6 +1067,29 @@ FRAGMENT;
 
 
   /**
+   * Retrieves text contents matching a given selector expression
+   * If you provide one matching more than one element, their textual contents will be concatenated
+   *
+   * @param string $selector
+   * @return $this
+   */
+  public function writeFetchText($selector)
+  {
+    $selector = Helpers::prepareArgument($selector);
+
+    $fragment = <<<FRAGMENT
+  casper.then(function() {
+    this.echo(this.fetchText($selector));
+  });
+FRAGMENT;
+
+    $this->addFragment($fragment);
+
+    return $this;
+  }
+
+
+  /**
    * Writes current page title to output
    *
    * @return $this
