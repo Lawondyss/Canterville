@@ -1074,13 +1074,9 @@ FRAGMENT;
    */
   public function writeCurrentUrl()
   {
-    $fragment = <<<FRAGMENT
-  casper.then(function() {
-    this.echo(this.getCurrentUrl());
-  });
-FRAGMENT;
+    $fragment = "'[currentUrl] ' + this.getCurrentUrl()";
 
-    $this->addFragment($fragment);
+    $this->write($fragment, true);
 
     return $this;
   }
@@ -1097,13 +1093,9 @@ FRAGMENT;
   {
     $selector = Helpers::prepareArgument($selector);
 
-    $fragment = <<<FRAGMENT
-  casper.then(function() {
-    this.echo(this.fetchText($selector));
-  });
-FRAGMENT;
+    $fragment = "'[fetchText] ' + this.fetchText($selector)";
 
-    $this->addFragment($fragment);
+    $this->write($fragment, true);
 
     return $this;
   }
@@ -1116,13 +1108,9 @@ FRAGMENT;
    */
   public function writeTitle()
   {
-    $fragment = <<<FRAGMENT
-  casper.then(function() {
-    this.echo("[title] " + this.getTitle());
-  });
-FRAGMENT;
+    $fragment = "'[title] ' + this.getTitle()";
 
-    $this->addFragment($fragment);
+    $this->write($fragment, true);
 
     return $this;
   }
