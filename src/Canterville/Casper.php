@@ -77,7 +77,7 @@ class Casper
 
   private $options = [
     'log-level' => self::LOG_LEVEL_INFO,
-    'engine' => self::ENGINE_SLIMMERJS,
+    'engine' => self::ENGINE_PHANTOMJS,
   ];
 
 
