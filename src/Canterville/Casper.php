@@ -8,6 +8,7 @@
 
 namespace Canterville;
 
+use Canterville\Utils\Helpers;
 use Nette\Utils\Json;
 use Nette\Utils\Strings;
 use Nette\Utils\FileSystem;
@@ -92,6 +93,16 @@ class Casper
     $this->options['log-level'] = $logLevel;
 
     return $this;
+  }
+
+
+  /**
+   * @return string
+   * @throws \Canterville\NonExistsException
+   */
+  public function getLogLevel()
+  {
+    return $this->getOption('log-level');
   }
 
 
@@ -1008,8 +1019,13 @@ FRAGMENT;
     while (!feof($fp)) {
       $line = fread($fp, 1024);
 
-      // skip line with message of PhantomJS bug
-      if (Strings::contains($line, 'Unsafe JavaScript attempt to access frame')) {
+      // skip line with message of PhantomJS bug for non-debug level
+      if ($this->getLogLevel() !== self::LOG_LEVEL_DEBUG && Strings::contains($line, 'Unsafe JavaScript attempt to access frame')) {
+        continue;
+      }
+
+      // skip JS strict warnings for non-debug level
+      if ($this->getLogLevel() !== self::LOG_LEVEL_DEBUG && Strings::contains($line, 'JavaScript strict warning:')) {
         continue;
       }
 
@@ -1022,7 +1038,7 @@ FRAGMENT;
       flush();
     }
     echo PHP_EOL;
-    fclose($fp);
+    pclose($fp);
   }
 
 
@@ -1034,13 +1050,28 @@ FRAGMENT;
    */
   private function getCommand($filename)
   {
-    $options = $this->getCommandOptions();
-
     $commands = [];
+
+    // Canterville binaries has higher priority as user binaries
     $commands[] = 'export PATH=' . $this->getBinDir() . ':$PATH';
+
+    // SlimJS required set path to Firefox
     if ($this->getOption('engine') === self::ENGINE_SLIMMERJS) {
-      $commands[] = 'export SLIMERJSLAUNCHER=/Applications/Firefox.app/Contents/MacOS/firefox';
+      switch (Helpers::getOS()) {
+        case Helpers::OS_MAC:
+          $commands[] = 'export SLIMERJSLAUNCHER=/Applications/Firefox.app/Contents/MacOS/firefox';
+          break;
+        case Helpers::OS_WINDOWS:
+          $commands[] = 'SET SLIMERJSLAUNCHER="c:\Program Files\Mozilla Firefox\firefox.exe';
+          break;
+        case Helpers::OS_LINUX:
+          $commands[] = 'export SLIMERJSLAUNCHER=/usr/bin/firefox';
+          break;
+      }
     }
+
+    // run script on CasperJS with options
+    $options = $this->getCommandOptions();
     $commands[] = 'casperjs ' . $filename . $options;
 
     return implode(';', $commands);
@@ -1079,9 +1110,9 @@ FRAGMENT;
    */
   private function getInfoHeader($command)
   {
-    $commands = explode(';', $command);
     // casper command is last
-    $casperCommand = array_shift(array_reverse($commands));
+    $commands = array_reverse(explode(';', $command));
+    $casperCommand = array_shift($commands);
 
     $values = Json::decode(file_get_contents(__DIR__ . '/../../composer.json'));
     $version = $values->version;
@@ -1094,7 +1125,7 @@ FRAGMENT;
  | |__| (_| | | | | ||  __/ |   \ V /| | | |  __/
   \____\__,_|_| |_|\__\___|_|    \_/ |_|_|_|\___| v$version
 
-run $casperCommand
+run CasperJS: $casperCommand
 
 
 HEADER;
