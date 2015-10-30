@@ -1,11 +1,10 @@
 <?php
 /**
- * Class CasperInstaller
  * @package Canterville\Installers
  * @author Ladislav Vondráček
  */
 
-namespace Canterville\Installers;
+namespace Canterville\Installer;
 
 use Canterville\Utils\Cli;
 use Nette\Utils\FileSystem;

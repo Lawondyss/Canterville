@@ -8,7 +8,7 @@
 
 namespace Canterville;
 
-use Canterville\Installers as CI;
+use Canterville\Installer as CI;
 use Composer\Script\Event;
 
 class Installer

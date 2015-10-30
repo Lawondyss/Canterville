@@ -1,11 +1,10 @@
 <?php
 /**
- * Class BaseInstaller
  * @package Canterville\Installers
  * @author Ladislav Vondráček
  */
 
-namespace Canterville\Installers;
+namespace Canterville\Installer;
 
 use Canterville\Exception\NotExistsException;
 use Canterville\Exception\NotSetException;
