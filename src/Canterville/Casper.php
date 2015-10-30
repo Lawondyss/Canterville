@@ -415,7 +415,34 @@ FRAGMENT;
   casper.then(function() {
     this.download($url, $filename);
   });
+FRAGMENT;
 
+    $this->addFragment($fragment);
+
+    return $this;
+  }
+
+
+  /**
+   * Evaluates an expression in the current page DOM context
+   *
+   * @param string $code
+   * @param array $args
+   * @return $this
+   */
+  public function evaluate($code, array $args = [])
+  {
+    $args = array_map('Canterville\Utils\Helpers::prepareArgument', $args);
+    $argsNames = implode(', ', array_keys($args));
+    $argsValues = implode(', ', $args);
+    if ($argsValues !== '') {
+      $argsValues = ', ' . $argsValues;
+    }
+
+    $fragment = <<<FRAGMENT
+  casper.evaluate(function($argsNames) {
+    $code
+  }$argsValues);
 FRAGMENT;
 
     $this->addFragment($fragment);
