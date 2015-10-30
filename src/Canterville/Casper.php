@@ -54,6 +54,9 @@ class Casper
   const LOG_LEVEL_WARNING = 'warning';
   const LOG_LEVEL_ERROR = 'error';
 
+  const ENGINE_SLIMMERJS = 'slimerjs';
+  const ENGINE_PHANTOMJS = 'phantomjs';
+
 
   // array of functions that run if is debug, one argument is message
   public $onLog = [];
@@ -73,19 +76,32 @@ class Casper
   private $script = '';
 
   private $options = [
-    'log-level' => 'info',
+    'log-level' => self::LOG_LEVEL_INFO,
+    'engine' => self::ENGINE_SLIMMERJS,
   ];
 
 
   /************************** GETTERS AND SETTERS **************************/
 
   /**
-   * @param boolean $debug
+   * @param string $logLevel
    * @return \Canterville\Casper
    */
   public function setLogLevel($logLevel)
   {
     $this->options['log-level'] = $logLevel;
+
+    return $this;
+  }
+
+
+  /**
+   * @param string $engine
+   * @return \Canterville\Casper
+   */
+  public function setEngine($engine)
+  {
+    $this->setOption('engine', $engine);
 
     return $this;
   }
@@ -193,6 +209,22 @@ class Casper
     $this->options[$name] = $value;
 
     return $this;
+  }
+
+
+  /**
+   * @param string $name
+   * @return mixed
+   * @throws \Canterville\NonExistsException
+   */
+  public function getOption($name)
+  {
+    if (!array_key_exists($name, $this->options)) {
+      $msg = sprintf('Option "%s" not set.', $name);
+      throw new NonExistsException($msg);
+    }
+    
+    return $this->options[$name];
   }
 
 
@@ -1004,10 +1036,12 @@ FRAGMENT;
   {
     $options = $this->getCommandOptions();
 
-    $commands = [
-        'export PATH=' . $this->getBinDir() . ':$PATH',
-        'casperjs ' . $filename . $options,
-    ];
+    $commands = [];
+    $commands[] = 'export PATH=' . $this->getBinDir() . ':$PATH';
+    if ($this->getOption('engine') === self::ENGINE_SLIMMERJS) {
+      $commands[] = 'export SLIMERJSLAUNCHER=/Applications/Firefox.app/Contents/MacOS/firefox';
+    }
+    $commands[] = 'casperjs ' . $filename . $options;
 
     return implode(';', $commands);
   }
@@ -1045,7 +1079,10 @@ FRAGMENT;
    */
   private function getInfoHeader($command)
   {
-    list(, $casperCommand) = explode(';', $command);
+    $commands = explode(';', $command);
+    // casper command is last
+    $casperCommand = array_shift(array_reverse($commands));
+
     $values = Json::decode(file_get_contents(__DIR__ . '/../../composer.json'));
     $version = $values->version;
 
