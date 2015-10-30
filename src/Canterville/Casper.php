@@ -79,8 +79,8 @@ class Casper
   private $script = '';
 
   private $options = [
-    'log-level' => self::LOG_LEVEL_INFO,
-    'engine' => self::ENGINE_PHANTOMJS,
+      'log-level' => self::LOG_LEVEL_INFO,
+      'engine' => self::ENGINE_PHANTOMJS,
   ];
 
   private $useFsModule = false;
@@ -238,7 +238,7 @@ class Casper
       $msg = sprintf('Option "%s" not set.', $name);
       throw new NotExistsException($msg);
     }
-    
+
     return $this->options[$name];
   }
 
@@ -261,13 +261,11 @@ class Casper
    */
   public function back()
   {
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.back();
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -283,15 +281,13 @@ FRAGMENT;
   {
     $count = Helpers::prepareArgument($count);
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.then(function() {
     this.bypass($count);
   });
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -312,10 +308,10 @@ FRAGMENT;
 
     if (isset($area)) {
       $validKeys = [
-        self::CAPTURE_AREA_TOP,
-        self::CAPTURE_AREA_LEFT,
-        self::CAPTURE_AREA_WIDTH,
-        self::CAPTURE_AREA_HEIGHT,
+          self::CAPTURE_AREA_TOP,
+          self::CAPTURE_AREA_LEFT,
+          self::CAPTURE_AREA_WIDTH,
+          self::CAPTURE_AREA_HEIGHT,
       ];
       $check = $this->checkValidKeys($validKeys, $area);
 
@@ -342,15 +338,13 @@ FRAGMENT;
     $area = Helpers::prepareArgument($area);
     $options = Helpers::prepareArgument($options);
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.then(function() {
     this.capture($filename, $area, $options);
   });
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -369,15 +363,13 @@ FRAGMENT;
   {
     $selector = Helpers::prepareArgument($selector);
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.then(function() {
     this.click($selector);
   });
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -395,15 +387,13 @@ FRAGMENT;
     $label = Helpers::prepareArgument($label);
     $tag = Helpers::prepareArgument($tag);
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.then(function() {
     this.clickLabel($label, $tag);
   });
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -421,15 +411,14 @@ FRAGMENT;
     $filename = Helpers::prepareArgument($filename);
     $url = isset($url) ? Helpers::prepareArgument($url) : 'this.getCurrentUrl()';
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.then(function() {
     this.download($url, $filename);
   });
 
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -450,15 +439,13 @@ FRAGMENT;
     $values = Helpers::prepareArgument($values);
     $submit = Helpers::prepareArgument($submit);
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.then(function() {
     this.fill($selector, $values, $submit);
   });
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -479,15 +466,13 @@ FRAGMENT;
     $values = Helpers::prepareArgument($values);
     $submit = Helpers::prepareArgument($submit);
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.then(function() {
     this.fillSelectors($selector, $values, $submit);
   });
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -508,15 +493,13 @@ FRAGMENT;
     $values = Helpers::prepareArgument($values);
     $submit = Helpers::prepareArgument($submit);
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.then(function() {
     this.fillXPath($selector, $values, $submit);
   });
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -529,13 +512,11 @@ FRAGMENT;
    */
   public function forward()
   {
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.forward();
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -560,12 +541,10 @@ FRAGMENT;
 
     // write to output
     if (!isset($filename)) {
-      $fragment =
-<<<FRAGMENT
+      $fragment = <<<FRAGMENT
   casper.then(function() {
     this.echo($fragmentGetHtml);
   });
-
 FRAGMENT;
     }
     // save to file
@@ -574,17 +553,15 @@ FRAGMENT;
 
       $filename = Helpers::prepareArgument($filename);
 
-      $fragment =
-<<<FRAGMENT
+      $fragment = <<<FRAGMENT
   casper.then(function() {
     fs.write($filename, $fragmentGetHtml);
     this.echo("[save] HTML to $filename");
   });
-
 FRAGMENT;
     }
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -600,31 +577,29 @@ FRAGMENT;
   {
     $fragmentGetPageContent = "this.getPageContent()";
 
+    // write to output
     if (!isset($filename)) {
-      $fragment =
-<<<FRAGMENT
+      $fragment = <<<FRAGMENT
   casper.then(function() {
     this.echo($fragmentGetPageContent);
   });
-
 FRAGMENT;
     }
+    // save to file
     else {
       $this->useFsModule = true;
 
       $filename = Helpers::prepareArgument($filename);
 
-      $fragment =
-<<<FRAGMENT
+      $fragment = <<<FRAGMENT
   casper.then(function() {
     fs.write($filename, $fragmentGetPageContent);
     this.echo("[save] page content to $filename");
   });
-
 FRAGMENT;
     }
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -642,17 +617,17 @@ FRAGMENT;
     $message = Helpers::prepareArgument($message);
     $logLevel = Helpers::prepareArgument($logLevel);
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.then(function() {
     this.log($message, $logLevel);
   });
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
+
 
   /**
    * Triggers a mouse event on the first element found matching the provided selector
@@ -665,12 +640,12 @@ FRAGMENT;
   public function mouseEvent($selector, $event)
   {
     $supportedEvents = [
-      self::EVENT_CLICK,
-      self::EVENT_MOUSE_DOWN,
-      self::EVENT_MOUSE_MOVE,
-      self::EVENT_MOUSE_OUT,
-      self::EVENT_MOUSE_OVER,
-      self::EVENT_MOUSE_UP,
+        self::EVENT_CLICK,
+        self::EVENT_MOUSE_DOWN,
+        self::EVENT_MOUSE_MOVE,
+        self::EVENT_MOUSE_OUT,
+        self::EVENT_MOUSE_OVER,
+        self::EVENT_MOUSE_UP,
     ];
 
     if (!in_array($event, $supportedEvents)) {
@@ -681,15 +656,13 @@ FRAGMENT;
     $selector = Helpers::prepareArgument($selector);
     $event = Helpers::prepareArgument($event);
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.then(function() {
     this.mouseEvent($event, $selector);
   });
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -710,9 +683,9 @@ FRAGMENT;
 
     if (isset($settings)) {
       $validKeys = [
-        self::OPEN_OPTION_METHOD,
-        self::OPEN_OPTION_DATA,
-        self::OPEN_OPTION_HEADERS,
+          self::OPEN_OPTION_METHOD,
+          self::OPEN_OPTION_DATA,
+          self::OPEN_OPTION_HEADERS,
       ];
       $invalidKeys = $this->checkValidKeys($validKeys, $settings);
 
@@ -725,13 +698,11 @@ FRAGMENT;
 
     $settings = Helpers::prepareArgument($settings);
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.open($url, $settings);
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -744,13 +715,11 @@ FRAGMENT;
    */
   public function reload()
   {
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.reload();
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -763,21 +732,19 @@ FRAGMENT;
    */
   public function run($preserveScript = false)
   {
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.run();
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     // for work with files must be required fs module
     if ($this->useFsModule) {
-      $fragment =
-<<<FRAGMENT
+      $fragment = <<<FRAGMENT
   var fs = require('fs');
 FRAGMENT;
 
-      $this->script = $fragment . $this->script;
+      $this->shiftFragment($fragment);
     }
 
     $filename = uniqid('casper-') . '.js';
@@ -804,15 +771,13 @@ FRAGMENT;
     $down = Helpers::prepareArgument($down);
     $right = Helpers::prepareArgument($right);
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.then(function() {
     this.scrollTo($right, $down);
   });
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -825,16 +790,14 @@ FRAGMENT;
    */
   public function scrollToBottom()
   {
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.then(function() {
     this.scrollToBottom();
     this.echo("[scrollToBottom]");
   });
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -866,9 +829,9 @@ FRAGMENT;
         }
         else {
           $msg = sprintf(
-            'Value in option "%s" must be array, given "%s".',
-            self::SEND_KEYS_OPTION_MODIFIERS,
-            gettype($options[self::SEND_KEYS_OPTION_MODIFIERS])
+              'Value in option "%s" must be array, given "%s".',
+              self::SEND_KEYS_OPTION_MODIFIERS,
+              gettype($options[self::SEND_KEYS_OPTION_MODIFIERS])
           );
           throw new InvalidArgumentException($msg);
         }
@@ -878,15 +841,13 @@ FRAGMENT;
 
     $options = Helpers::prepareArgument($options);
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.then(function() {
     this.sendKeys($selector, $keys, $options);
   });
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -902,11 +863,9 @@ FRAGMENT;
   {
     $this->clean();
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   var casper = require('casper').create({
     verbose: true,
-    logLevel: 'debug',
     pageSettings: {
       javascriptEnabled: true,
       userAgent: '$this->userAgent'
@@ -918,15 +877,13 @@ FRAGMENT;
   });
 
   casper.start();
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     if (isset($url)) {
       $url = Helpers::prepareArgument($url);
-      $fragment =
-<<<FRAGMENT
+      $fragment = <<<FRAGMENT
   casper.then(function() {
     this.open($url, {
       headers: {
@@ -934,9 +891,9 @@ FRAGMENT;
       }
     });
   });
-
 FRAGMENT;
-      $this->script .= $fragment;
+
+      $this->addFragment($fragment);
     }
 
     return $this;
@@ -953,15 +910,13 @@ FRAGMENT;
   {
     $mSeconds = Helpers::prepareArgument($seconds * 1000);
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.wait($mSeconds, function() {
     this.echo('[wait] time $seconds sec occurred');
   });
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -983,8 +938,7 @@ FRAGMENT;
     }
     $maxSeconds = Helpers::prepareArgument($maxSeconds);
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.waitForSelector($selector,
     function() {
       this.echo("[waitForSelector] element $selector found");
@@ -992,10 +946,9 @@ FRAGMENT;
     function() {
       this.echo("[waitForSelector] time for wait on element $selector occurred");
     }, $maxSeconds);
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -1017,8 +970,7 @@ FRAGMENT;
     }
     $maxSeconds = Helpers::prepareArgument($maxSeconds);
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.waitForText($text,
     function() {
       this.echo("[waitForText] text $text found");
@@ -1026,10 +978,9 @@ FRAGMENT;
     function() {
       this.echo("[waitForText] time for wait on text $text occurred);
     }, $maxSeconds);
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -1049,8 +1000,7 @@ FRAGMENT;
     }
     $maxSeconds = Helpers::prepareArgument($maxSeconds);
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.waitForUrl(/$url/,
     function() {
       this.echo("[waitForUrl] redirected to $url");
@@ -1058,10 +1008,9 @@ FRAGMENT;
     function() {
       this.echo("[waitForUrl] time for wait on URL $url occurred");
     }, $maxSeconds);
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -1078,15 +1027,13 @@ FRAGMENT;
   {
     $string = $evaluate ? $string : Helpers::prepareArgument($string);
 
-    $fragment =
-<<<FRAGMENT
+    $fragment = <<<FRAGMENT
   casper.then(function() {
     this.echo($string);
   });
-
 FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
@@ -1099,20 +1046,41 @@ FRAGMENT;
    */
   public function writeTitle()
   {
-    $fragment =
-<<<FRAGMETN
+    $fragment = <<<FRAGMENT
   casper.then(function() {
     this.echo("[title] " + this.getTitle());
   });
-FRAGMETN;
+FRAGMENT;
 
-    $this->script .= $fragment;
+    $this->addFragment($fragment);
 
     return $this;
   }
 
 
   /************************** HELPERS **************************/
+
+  /**
+   * Added fragment of JS for CasperJS to end
+   *
+   * @param string $fragment
+   */
+  private function addFragment($fragment)
+  {
+    $this->script .= $fragment . PHP_EOL;
+  }
+
+
+  /**
+   * Added fragment of JS for CasperJS to begin
+   *
+   * @param string $fragment
+   */
+  private function shiftFragment($fragment)
+  {
+    $this->script = $fragment . PHP_EOL . $this->script;
+  }
+
 
   /**
    * Clear the current CasperJS script
@@ -1297,8 +1265,7 @@ FRAGMETN;
     $values = Json::decode(file_get_contents(__DIR__ . '/../../composer.json'));
     $version = $values->version;
 
-    $infoHeader =
-<<< HEADER
+    $infoHeader = <<< HEADER
    ____            _                  _ _ _
   / ___|__ _ _ __ | |_ ___ _ ____   _(_) | | ___
  | |   / _` | '_ \| __/ _ \ '__\ \ / / | | |/ _ \
