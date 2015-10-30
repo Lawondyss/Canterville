@@ -565,6 +565,7 @@ FRAGMENT;
   casper.then(function() {
     this.echo($fragmentGetHtml);
   });
+
 FRAGMENT;
     }
     // save to file
@@ -579,6 +580,47 @@ FRAGMENT;
     fs.write($filename, $fragmentGetHtml);
     this.echo("[save] HTML to $filename");
   });
+
+FRAGMENT;
+    }
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+
+  /**
+   * Retrieves current page contents, dealing with exotic other content types than HTML
+   *
+   * @param null|string $filename
+   * @return $this
+   */
+  public function getPageContent($filename = null)
+  {
+    $fragmentGetPageContent = "this.getPageContent()";
+
+    if (!isset($filename)) {
+      $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    this.echo($fragmentGetPageContent);
+  });
+
+FRAGMENT;
+    }
+    else {
+      $this->useFsModule = true;
+
+      $filename = Helpers::prepareArgument($filename);
+
+      $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    fs.write($filename, $fragmentGetPageContent);
+    this.echo("[save] page content to $filename");
+  });
+
 FRAGMENT;
     }
 
