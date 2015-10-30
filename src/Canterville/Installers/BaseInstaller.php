@@ -7,8 +7,8 @@
 
 namespace Canterville\Installers;
 
-use Canterville\NonExistsException;
-use Canterville\NotSetException;
+use Canterville\Exception\NotExistsException;
+use Canterville\Exception\NotSetException;
 use Composer\Composer;
 use Composer\Package\Package;
 use Composer\Package\Version\VersionParser;
@@ -65,7 +65,7 @@ abstract class BaseInstaller
    * Method run before install
    *
    * @throws \Canterville\NonExistsException
-   * @throws \Canterville\NotSetException
+   * @throws \Canterville\Exception\NotSetException
    */
   protected function init()
   {
@@ -76,7 +76,7 @@ abstract class BaseInstaller
     $calledClass = get_called_class();
 
     if (!method_exists($calledClass, 'copyToBinFolder')) {
-      throw new NonExistsException(sprintf('Method "' . $calledClass . '::%s" non exists.', 'copyToBinFolder'));
+      throw new NotExistsException(sprintf('Method "' . $calledClass . '::%s" non exists.', 'copyToBinFolder'));
     }
 
     $errorMsg = 'Property "' . $calledClass . '::$%s" not set.';

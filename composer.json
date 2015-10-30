@@ -22,6 +22,6 @@
     "psr-0": {
       "Canterville": "src/"
     },
-    "classmap": ["src/Canterville/exceptions.php"]
+    "classmap": ["src/Canterville/Exception/exceptions.php"]
   }
 }

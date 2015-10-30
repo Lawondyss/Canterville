@@ -7,7 +7,7 @@
 
 namespace Canterville\Installers;
 
-use Canterville\RuntimeException;
+use Canterville\Exception\RuntimeException;
 use Canterville\Utils\Cli;
 use Canterville\Utils\Helpers;
 use Nette\Utils\FileSystem;
@@ -28,7 +28,7 @@ class PhantomInstaller extends BaseInstaller
    * Copies the PhantomJS binary to the bin folder
    *
    * @param string $binDir
-   * @throws \Canterville\RuntimeException
+   * @throws \Canterville\Exception\RuntimeException
    */
   protected function copyToBinFolder($binDir)
   {

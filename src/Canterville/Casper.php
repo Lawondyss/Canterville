@@ -8,6 +8,7 @@
 
 namespace Canterville;
 
+use Canterville\Exception\InvalidArgumentException;
 use Canterville\Utils\Helpers;
 use Nette\Utils\Json;
 use Nette\Utils\Strings;
@@ -98,7 +99,7 @@ class Casper
 
   /**
    * @return string
-   * @throws \Canterville\NonExistsException
+   * @throws \Canterville\Exception\NotExistsException
    */
   public function getLogLevel()
   {
@@ -170,7 +171,7 @@ class Casper
   /**
    * @param string $binDir
    * @return \Canterville\Casper
-   * @throws \Canterville\InvalidArgumentException
+   * @throws \Canterville\Exception\InvalidArgumentException
    */
   public function setBinDir($binDir)
   {

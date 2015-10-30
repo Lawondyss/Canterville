@@ -7,7 +7,7 @@
 
 namespace Canterville\Installers;
 
-use Canterville\RuntimeException;
+use Canterville\Exception\RuntimeException;
 use Canterville\Utils\Cli;
 use Canterville\Utils\Helpers;
 use Nette\Utils\FileSystem;
