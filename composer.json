@@ -1,7 +1,7 @@
 {
   "name": "lawondyss/canterville",
   "description": "A PHP headless browser.",
-  "version": "0.3",
+  "version": "0.4",
   "keywords": ["CasperJS", "PhantomJS", "SlimerJS", "Headless Browser"],
   "type": "library",
   "license": "BSD-2-Clause",
