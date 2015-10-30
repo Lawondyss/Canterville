@@ -631,6 +631,30 @@ FRAGMENT;
 
 
   /**
+   * Logs a message with an optional level
+   *
+   * @param string $message
+   * @param string $logLevel Default INFO.
+   * @return $this
+   */
+  public function log($message, $logLevel = self::LOG_LEVEL_INFO)
+  {
+    $message = Helpers::prepareArgument($message);
+    $logLevel = Helpers::prepareArgument($logLevel);
+
+    $fragment =
+<<<FRAGMENT
+  casper.then(function() {
+    this.log($message, $logLevel);
+  });
+FRAGMENT;
+
+    $this->script .= $fragment;
+
+    return $this;
+  }
+
+  /**
    * Triggers a mouse event on the first element found matching the provided selector
    *
    * @param string $selector
