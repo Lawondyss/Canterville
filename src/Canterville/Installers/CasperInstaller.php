@@ -16,9 +16,8 @@ class CasperInstaller extends BaseInstaller
   {
     $this->name = 'CasperJS';
     $this->version = '1.1-beta3';
-    $this->url = $this->getUrl($this->version);
-    $this->distType = 'zip';
-    $this->targetDir = 'vendor/lawondyss/casperjs';
+
+    parent::init();
   }
 
 
@@ -29,9 +28,8 @@ class CasperInstaller extends BaseInstaller
   {
     FileSystem::createDir($binDir);
 
-    $source = __DIR__ . '/../../../' . $this->targetDir . '/bin/casperjs';
+    $source = $this->targetDir . '/bin/casperjs';
     $target = $binDir . '/casperjs';
-    $command = 'ln -sf ' . $source . ' ' . $target;
 
     Cli::makeSymbolicLink($source, $target);
   }
@@ -43,5 +41,15 @@ class CasperInstaller extends BaseInstaller
   protected function getUrl($version)
   {
     return 'https://github.com/n1k0/casperjs/zipball/' . $version;
+  }
+
+
+  /**
+   * @param string $url
+   * @return string
+   */
+  protected function getDistType($url)
+  {
+    return 'zip';
   }
 }

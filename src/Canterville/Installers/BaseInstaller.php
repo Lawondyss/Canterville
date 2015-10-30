@@ -12,9 +12,13 @@ use Canterville\NotSetException;
 use Composer\Composer;
 use Composer\Package\Package;
 use Composer\Package\Version\VersionParser;
+use Nette\Utils\Strings;
 
 abstract class BaseInstaller
 {
+  const AUTHOR_DIR = 'lawondyss/';
+
+
   protected $name;
 
   protected $version;
@@ -24,6 +28,8 @@ abstract class BaseInstaller
   protected $distType;
 
   protected $targetDir;
+
+  private $vendorDir;
 
 
   /**
@@ -63,6 +69,10 @@ abstract class BaseInstaller
    */
   protected function init()
   {
+    $this->url = $this->getUrl($this->version);
+    $this->distType = $this->getDistType($this->url);
+    $this->targetDir = $this->getVendorDir() . self::AUTHOR_DIR . Strings::lower($this->name) . '/';
+
     $calledClass = get_called_class();
 
     if (!method_exists($calledClass, 'copyToBinFolder')) {
@@ -118,14 +128,16 @@ abstract class BaseInstaller
 
 
   /**
-   * @param string $url
    * @return string
    */
-  protected function getDistType($url)
+  protected function getVendorDir()
   {
-    $distType = pathinfo($url, PATHINFO_EXTENSION) === 'zip' ? 'zip' : 'tar';
+    if (!isset($this->vendorDir)) {
+      $vendorDir = __DIR__ . '/../../../vendor';
+      $this->vendorDir = realpath($vendorDir) . '/';
+    }
 
-    return $distType;
+    return $this->vendorDir;
   }
 
 }

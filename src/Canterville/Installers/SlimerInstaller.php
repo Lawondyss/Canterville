@@ -19,9 +19,6 @@ class SlimerInstaller extends BaseInstaller
   {
     $this->name = 'SlimerJS';
     $this->version = '0.9.6';
-    $this->url = $this->getUrl($this->version);
-    $this->distType = $this->getDistType($this->url);
-    $this->targetDir = 'vendor/lawondyss/slimerjs';
 
     parent::init();
   }
@@ -39,12 +36,12 @@ class SlimerInstaller extends BaseInstaller
 
     $os = Helpers::getOS();
     
-      $source = '/slimerjs.bat';
     if ($os === Helpers::OS_WINDOWS) {
+      $source = $this->targetDir . '/slimerjs.bat';
       $target = $binDir . '/slimerjs.bat';
     }
     elseif (isset($os)) {
-      $source = __DIR__ . '/../../../' . $this->targetDir . '/slimerjs';
+      $source = $this->targetDir . '/slimerjs';
       $target = $binDir . '/slimerjs';
     }
     else {
