@@ -16,6 +16,11 @@ use Tester\Assert;
 class Helpers extends Tester\TestCase
 {
 
+  protected function teardown()
+  {
+    Nette\Utils\FileSystem::delete(TEMP_DIR);
+  }
+
   public function testGetOS()
   {
     $options = [null, CU\Helpers::OS_MAC, CU\Helpers::OS_LINUX, CU\Helpers::OS_WINDOWS];
