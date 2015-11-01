@@ -595,6 +595,11 @@ FRAGMENT;
    */
   public function getHTML($filename = null, $selector = null, $outer = false)
   {
+    if (!isset($selector) && $outer) {
+      $msg = sprintf('Cannot call method "%s" with positive parameter "%s" and not set parameter "%s".', __METHOD__, '$outer', '$selector');
+      throw new InvalidArgumentException($msg);
+    }
+
     $selector = Helpers::prepareArgument($selector);
     $outer = Helpers::prepareArgument($outer);
 
