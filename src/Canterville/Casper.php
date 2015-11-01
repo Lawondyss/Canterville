@@ -76,6 +76,8 @@ class Casper
 
   private $binDir;
 
+  private $tempDir = __DIR__;
+
   private $script = '';
 
   private $options = [
@@ -199,6 +201,28 @@ class Casper
     }
 
     return $this->binDir;
+  }
+
+
+  /**
+   * @param string $tempDir
+   * @return $this
+   */
+  public function setTempDir($tempDir)
+  {
+    FileSystem::createDir($tempDir);
+    $this->tempDir = $tempDir;
+
+    return $this;
+  }
+
+
+  /**
+   * @return string
+   */
+  public function getTempDir()
+  {
+    return $this->tempDir;
   }
 
 
@@ -774,7 +798,8 @@ FRAGMENT;
       $this->shiftFragment($fragment);
     }
 
-    $filename = uniqid('casper-') . '.js';
+    $tempDir = rtrim($this->tempDir, '/\\') . DIRECTORY_SEPARATOR;
+    $filename = $tempDir . uniqid('casper-') . '.js';
     FileSystem::write($filename, $this->script);
 
     $this->doRun($filename);
