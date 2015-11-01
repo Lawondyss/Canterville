@@ -197,6 +197,22 @@ FRAGMENT;
   }
 
 
+  public function testClick()
+  {
+    $selector = 'div#id';
+    $this->casper->click($selector)
+      ->generate();
+
+    $expected = <<<FRAGMENT
+  casper.then(function() {
+    this.click('$selector');
+  });
+
+FRAGMENT;
+    Assert::same($expected, $this->getCasperContent());
+  }
+
+
   public function testScrollToBottom()
   {
     $this->casper->scrollToBottom()
@@ -266,6 +282,22 @@ FRAGMENT;
   {
     $this->casper->writeTitle()
         ->generate();
+
+    $expected = <<<FRAGMENT
+  casper.then(function() {
+    this.echo('[title] ' + this.getTitle());
+  });
+
+FRAGMENT;
+
+    Assert::same($expected, $this->getCasperContent());
+  }
+
+
+  public function testWriteTitle()
+  {
+    $this->casper->writeTitle()
+      ->generate();
 
     $expected = <<<FRAGMENT
   casper.then(function() {
