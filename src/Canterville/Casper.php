@@ -592,6 +592,7 @@ FRAGMENT;
    * @param null|string $selector
    * @param bool|false $outer
    * @return $this
+   * @throws \Canterville\Exception\InvalidArgumentException
    */
   public function getHTML($filename = null, $selector = null, $outer = false)
   {
@@ -677,9 +678,27 @@ FRAGMENT;
    * @param string $message
    * @param string $logLevel Default INFO.
    * @return $this
+   * @throws \Canterville\Exception\InvalidArgumentException
    */
   public function log($message, $logLevel = self::LOG_LEVEL_INFO)
   {
+    if (!is_string($logLevel)) {
+      $msg = sprintf('Log level must be string, given "%s".', gettype($logLevel));
+      throw new InvalidArgumentException($msg);
+    }
+
+    $validLevels = [
+      self::LOG_LEVEL_DEBUG,
+      self::LOG_LEVEL_INFO,
+      self::LOG_LEVEL_WARNING,
+      self::LOG_LEVEL_ERROR,
+    ];
+
+    if (!in_array($logLevel, $validLevels)) {
+      $msg = sprintf('Log level "%s" is not expected.', $logLevel);
+      throw new InvalidArgumentException($msg);
+    }
+
     $message = Helpers::prepareArgument($message);
     $logLevel = Helpers::prepareArgument($logLevel);
 
