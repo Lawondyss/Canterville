@@ -799,15 +799,6 @@ FRAGMENT;
 
     $this->addFragment($fragment);
 
-    // for work with files must be required fs module
-    if ($this->useFsModule) {
-      $fragment = <<<FRAGMENT
-  var fs = require('fs');
-FRAGMENT;
-
-      $this->shiftFragment($fragment);
-    }
-
     $filename = $this->generate();
 
     $this->doRun($filename);
@@ -1158,6 +1149,15 @@ FRAGMENT;
    */
   public function generate()
   {
+    // for work with files must be required fs module
+    if ($this->useFsModule) {
+      $fragment = <<<FRAGMENT
+  var fs = require('fs');
+FRAGMENT;
+
+      $this->shiftFragment($fragment);
+    }
+
     $tempDir = rtrim($this->tempDir, '/\\') . DIRECTORY_SEPARATOR;
     $filename = $tempDir . uniqid('casper-') . '.js';
     FileSystem::write($filename, $this->script);
