@@ -125,6 +125,16 @@ class Casper
 
 
   /**
+   * @return string
+   * @throws \Canterville\Exception\NotExistsException
+   */
+  public function getEngine()
+  {
+    return $this->getOption('engine');
+  }
+
+
+  /**
    * @param string $userAgent
    * @return \Canterville\Casper
    */
