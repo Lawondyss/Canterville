@@ -724,6 +724,11 @@ FRAGMENT;
    */
   public function mouseEvent($selector, $event)
   {
+    if (!is_string($event)) {
+      $msg = sprintf('Mouse event must be string, given "%s".', gettype($event));
+      throw new InvalidArgumentException($msg);
+    }
+
     $supportedEvents = [
         self::EVENT_CLICK,
         self::EVENT_MOUSE_DOWN,
