@@ -41,13 +41,12 @@ class Casper_Download extends Tester\TestCase
   public function testFilename()
   {
     $this->casper->download($this->filename)
-      ->run(true);
+      ->generate();
 
     $expected = <<<FRAGMENT
   casper.then(function() {
     this.download(this.getCurrentUrl(), '{$this->filename}');
   });
-  casper.run();
 
 FRAGMENT;
     Assert::same($expected, $this->getCasperContent());
@@ -58,13 +57,12 @@ FRAGMENT;
   {
     $url = 'https://www.google.com/';
     $this->casper->download($this->filename, $url)
-        ->run(true);
+        ->generate();
 
     $expected = <<<FRAGMENT
   casper.then(function() {
     this.download('$url', '{$this->filename}');
   });
-  casper.run();
 
 FRAGMENT;
     Assert::same($expected, $this->getCasperContent());

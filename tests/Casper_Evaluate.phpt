@@ -40,13 +40,12 @@ class Casper_Evaluate extends Tester\TestCase
     $code = 'document.write("Lorem ipsum dolor sit amet.");';
 
     $this->casper->evaluate($code)
-      ->run(true);
+      ->generate();
 
     $expected = <<<FRAGMENT
   casper.evaluate(function() {
     $code
   });
-  casper.run();
 
 FRAGMENT;
     Assert::same($expected, $this->getCasperContent());
@@ -58,13 +57,12 @@ FRAGMENT;
     $code = 'document.write(message);';
 
     $this->casper->evaluate($code, ['message' => 'Lorem ipsum dolor sit amet.'])
-      ->run(true);
+      ->generate();
 
     $expected = <<<FRAGMENT
   casper.evaluate(function(message) {
     $code
   }, 'Lorem ipsum dolor sit amet.');
-  casper.run();
 
 FRAGMENT;
     Assert::same($expected, $this->getCasperContent());
@@ -76,13 +74,12 @@ FRAGMENT;
     $code = 'document.write(msg1 + " " + msg2);';
 
     $this->casper->evaluate($code, ['msg1' => 'Lorem ipsum dolor', 'msg2' => 'sit amet.'])
-      ->run(true);
+      ->generate();
 
     $expected = <<<FRAGMENT
   casper.evaluate(function(msg1, msg2) {
     $code
   }, 'Lorem ipsum dolor', 'sit amet.');
-  casper.run();
 
 FRAGMENT;
     Assert::same($expected, $this->getCasperContent());

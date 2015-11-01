@@ -38,7 +38,7 @@ class Casper_Start extends Tester\TestCase
   public function testStartWithoutUrl()
   {
     $this->casper->start()
-        ->run(true);
+        ->generate();
 
     $expected = <<<FRAGMENT
   var casper = require('casper').create({
@@ -54,7 +54,6 @@ class Casper_Start extends Tester\TestCase
   });
 
   casper.start();
-  casper.run();
 
 FRAGMENT;
 
@@ -64,7 +63,7 @@ FRAGMENT;
   public function testStartWithUrl()
   {
     $this->casper->start('https://www.google.com')
-        ->run(true);
+        ->generate();
 
     $expected = <<<FRAGMENT
   var casper = require('casper').create({
@@ -87,7 +86,6 @@ FRAGMENT;
       }
     });
   });
-  casper.run();
 
 FRAGMENT;
 

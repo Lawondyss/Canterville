@@ -808,9 +808,7 @@ FRAGMENT;
       $this->shiftFragment($fragment);
     }
 
-    $tempDir = rtrim($this->tempDir, '/\\') . DIRECTORY_SEPARATOR;
-    $filename = $tempDir . uniqid('casper-') . '.js';
-    FileSystem::write($filename, $this->script);
+    $filename = $this->generate();
 
     $this->doRun($filename);
     $this->logOutput();
@@ -1152,6 +1150,20 @@ FRAGMENT;
 
 
   /************************** HELPERS **************************/
+
+  /**
+   * Generate file with a JS script for run of CasperJS
+   *
+   * @return string Filename of JS script.
+   */
+  public function generate()
+  {
+    $tempDir = rtrim($this->tempDir, '/\\') . DIRECTORY_SEPARATOR;
+    $filename = $tempDir . uniqid('casper-') . '.js';
+    FileSystem::write($filename, $this->script);
+
+    return $filename;
+  }
 
   /**
    * Added fragment of JS for CasperJS to end

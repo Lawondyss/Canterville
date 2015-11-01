@@ -41,13 +41,12 @@ class Casper_Capture extends Tester\TestCase
   public function testFilename()
   {
     $this->casper->capture($this->filename)
-      ->run(true);
+      ->generate();
 
     $expected = <<<FRAGMENT
   casper.then(function() {
     this.capture('{$this->filename}', undefined, undefined);
   });
-  casper.run();
 
 FRAGMENT;
 
@@ -74,7 +73,7 @@ FRAGMENT;
     }, \Canterville\Exception\InvalidArgumentException::class);
 
     $this->casper->capture($this->filename, [Casper::CAPTURE_AREA_TOP => 0, Casper::CAPTURE_AREA_LEFT => 0, Casper::CAPTURE_AREA_WIDTH => 0, Casper::CAPTURE_AREA_HEIGHT => 0])
-      ->run(true);
+      ->generate();
 
     $expected = <<<FRAGMENT
   casper.then(function() {
@@ -85,7 +84,6 @@ FRAGMENT;
     "height": 0
 }, undefined);
   });
-  casper.run();
 
 FRAGMENT;
     Assert::same($expected, $this->getCasperContent());
@@ -95,7 +93,7 @@ FRAGMENT;
   public function testOptions()
   {
     $this->casper->capture($this->filename, null, ['format' => 'jpg', 'quality' => '100'])
-        ->run(true);
+        ->generate();
     $expected = <<<FRAGMENT
   casper.then(function() {
     this.capture('{$this->filename}', undefined, {
@@ -103,7 +101,6 @@ FRAGMENT;
     "quality": "100"
 });
   });
-  casper.run();
 
 FRAGMENT;
     Assert::same($expected, $this->getCasperContent());

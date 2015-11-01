@@ -41,13 +41,12 @@ class Casper_FillSelectors extends Tester\TestCase
   public function testSelector()
   {
     $this->casper->fillSelectors($this->selector, [])
-      ->run(true);
+      ->generate();
 
     $expected = <<<FRAGMENT
   casper.then(function() {
     this.fillSelectors('{$this->selector}', [], false);
   });
-  casper.run();
 
 FRAGMENT;
     Assert::same($expected, $this->getCasperContent());
@@ -58,7 +57,7 @@ FRAGMENT;
   {
     $values = ['#input-nick' => 'Lawondyss', '#input-email' => 'lad.von@gmail.com'];
     $this->casper->fillSelectors($this->selector, $values)
-      ->run(true);
+      ->generate();
 
     $expected = <<<FRAGMENT
   casper.then(function() {
@@ -67,7 +66,6 @@ FRAGMENT;
     "#input-email": "lad.von@gmail.com"
 }, false);
   });
-  casper.run();
 
 FRAGMENT;
     Assert::same($expected, $this->getCasperContent());
@@ -77,13 +75,12 @@ FRAGMENT;
   public function testSubmit()
   {
     $this->casper->fillSelectors($this->selector, [], true)
-      ->run(true);
+      ->generate();
 
     $expected = <<<FRAGMENT
   casper.then(function() {
     this.fillSelectors('{$this->selector}', [], true);
   });
-  casper.run();
 
 FRAGMENT;
     Assert::same($expected, $this->getCasperContent());

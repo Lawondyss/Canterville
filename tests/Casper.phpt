@@ -156,11 +156,10 @@ FRAGMENT;
   public function testBack()
   {
     $this->casper->back()
-        ->run(true);
+        ->generate();
 
     $expected = <<<FRAGMENT
   casper.back();
-  casper.run();
 
 FRAGMENT;
 
@@ -174,13 +173,12 @@ FRAGMENT;
   public function testBypass($count)
   {
     $this->casper->bypass($count)
-        ->run(true);
+        ->generate();
 
     $expected = <<<FRAGMENT
   casper.then(function() {
     this.bypass($count);
   });
-  casper.run();
 
 FRAGMENT;
 
@@ -202,14 +200,13 @@ FRAGMENT;
   public function testScrollToBottom()
   {
     $this->casper->scrollToBottom()
-        ->run(true);
+        ->generate();
 
     $expected = <<<FRAGMENT
   casper.then(function() {
     this.scrollToBottom();
     this.echo("[scrollToBottom]");
   });
-  casper.run();
 
 FRAGMENT;
 
@@ -223,7 +220,7 @@ FRAGMENT;
   public function testWait($seconds)
   {
     $this->casper->wait($seconds)
-        ->run(true);
+        ->generate();
 
     $mSeconds = $seconds * 1000;
 
@@ -231,7 +228,6 @@ FRAGMENT;
   casper.wait($mSeconds, function() {
     this.echo('[wait] time $seconds sec occurred');
   });
-  casper.run();
 
 FRAGMENT;
 
@@ -253,13 +249,12 @@ FRAGMENT;
   public function testWriteCurrentUrl()
   {
     $this->casper->writeCurrentUrl()
-        ->run(true);
+        ->generate();
 
     $expected = <<<FRAGMENT
   casper.then(function() {
     this.echo('[currentUrl] ' + this.getCurrentUrl());
   });
-  casper.run();
 
 FRAGMENT;
 
@@ -270,13 +265,12 @@ FRAGMENT;
   public function testWriteFetchText()
   {
     $this->casper->writeTitle()
-        ->run(true);
+        ->generate();
 
     $expected = <<<FRAGMENT
   casper.then(function() {
     this.echo('[title] ' + this.getTitle());
   });
-  casper.run();
 
 FRAGMENT;
 

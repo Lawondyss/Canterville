@@ -41,13 +41,12 @@ class Casper_ClickLabel extends Tester\TestCase
   public function testLabel()
   {
     $this->casper->clickLabel($this->label)
-      ->run(true);
+      ->generate();
 
     $expected = <<<FRAGMENT
   casper.then(function() {
     this.clickLabel('{$this->label}', undefined);
   });
-  casper.run();
 
 FRAGMENT;
 
@@ -59,13 +58,12 @@ FRAGMENT;
   {
     $tag = 'div';
     $this->casper->clickLabel($this->label, $tag)
-      ->run(true);
+      ->generate();
 
     $expected = <<<FRAGMENT
   casper.then(function() {
     this.clickLabel('{$this->label}', '$tag');
   });
-  casper.run();
 
 FRAGMENT;
 
